@@ -91,3 +91,11 @@ Route::get('/order-detail/{order_id}', [OrderController::class, 'orderDetail']);
 //shipping
 Route::post('/save-shipping', [CustomerController::class, 'saveShipping']);
 Route::get('/payment', [CustomerController::class, 'payment']);
+
+//
+Route::get('/manage-order', [OrderController::class, 'manage_order']);
+Route::get('/view-order/{orderId}', [OrderController::class, 'view_order']);
+Route::post('/update-order-status/{orderId}', [OrderController::class, 'updateOrderStatus']);
+
+//in hoa đơn
+Route::get('/print-invoice/{orderId}', [OrderController::class, 'print_invoice']);

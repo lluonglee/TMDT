@@ -6,30 +6,55 @@
     <h2 class="title text-center">Danh mục sản phẩm</h2>
 
     @foreach($all_product as $product)
-    <a href="{{URL('/chi-tiet-san-pham/'.$product->product_id)}}">
+    @php
+    $discount_price = $product->product_price * (1 - $product->discount / 100);
+    @endphp
+
+    <a href="{{ URL('/chi-tiet-san-pham/'.$product->product_id) }}">
         <div class="col-sm-4">
             <div class="product-image-wrapper">
                 <div class="single-products">
                     <div class="productinfo text-center">
-                        <img src="{{ asset($product->product_image) }}" alt="" />
+                        <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}" />
+
+                        @php
+                        $discount_price = $product->product_price * (1 - $product->discount / 100);
+                        @endphp
+
+                        @if($product->discount > 0)
+                        <h2>
+                            <span style="text-decoration: line-through; color: red;">
+                                {{ number_format($product->product_price, 0, ',', '.') }} VNĐ
+                            </span>
+                            <br>
+                            <span style="color: green; font-weight: bold;">
+                                {{ number_format($discount_price, 0, ',', '.') }} VNĐ
+                            </span>
+                        </h2>
+                        @else
                         <h2>{{ number_format($product->product_price, 0, ',', '.') }} VNĐ</h2>
-                        <p>{{$product->product_name}}</p>
-                        <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Thêm giỏ
-                            hàng</a>
+                        @endif
+
+                        <p>{{ $product->product_name }}</p>
+
+                        <!-- Form để thêm vào giỏ hàng -->
+                        <form action="{{ URL('/save-cart') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="product_id_hidden" value="{{ $product->product_id }}">
+
+                            <!-- Ẩn input số lượng nhưng vẫn giữ giá trị mặc định là 1 -->
+                            <input type="hidden" name="qty" value="1">
+
+                            <button type="submit" class="btn btn-default add-to-cart">
+                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                            </button>
+                        </form>
                     </div>
-                    <!-- <div class="product-overlay">
-                    <div class="overlay-content">
-                        <h2>$56</h2>
-                        <p>Easy Polo Black Edition</p>
-                        <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to
-                            cart</a>
-                    </div>
-                </div> -->
                 </div>
                 <div class="choose">
                     <ul class="nav nav-pills nav-justified">
-                        <li><a href="#"><i class="fa fa-plus-square"></i>yêu thích</a></li>
-                        <li><a href="#"><i class="fa fa-plus-square"></i>Thêm so sánh</a></li>
+                        <li><a href="#"><i class="fa fa-plus-square"></i> Yêu thích</a></li>
+                        <li><a href="#"><i class="fa fa-plus-square"></i> Thêm so sánh</a></li>
                     </ul>
                 </div>
             </div>
@@ -37,6 +62,7 @@
     </a>
 
     @endforeach
+
 
 
 </div>

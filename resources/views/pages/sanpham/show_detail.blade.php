@@ -12,10 +12,30 @@
         <div class="product-information">
             <h2>{{ $detail_product->product_name }}</h2>
             <p>Mã sản phẩm: {{ $detail_product->product_id }}</p>
+
             <form action="{{ URL::to('/save-cart') }}" method="POST">
                 @csrf
                 <span>
-                    <span>{{ number_format($detail_product->product_price, 0, ',', '.') }} VNĐ</span>
+                    @php
+                    $discount_price = $detail_product->product_price * (1 - $detail_product->discount / 100);
+                    @endphp
+
+                    @if($detail_product->discount > 0)
+                    <span>
+                        <span style="text-decoration: line-through; color: red; font-size: 18px;">
+                            {{ number_format($detail_product->product_price, 0, ',', '.') }} VNĐ
+                        </span>
+                        <br>
+                        <span style="color: green; font-size: 24px; font-weight: bold;">
+                            {{ number_format($discount_price, 0, ',', '.') }} VNĐ
+                        </span>
+                    </span>
+                    @else
+                    <span style="font-size: 24px; font-weight: bold;">
+                        {{ number_format($detail_product->product_price, 0, ',', '.') }} VNĐ
+                    </span>
+                    @endif
+
                     <label>Số lượng:</label>
                     <input type="number" name="qty" value="1" min="1" />
                     <input type="hidden" name="product_id_hidden" value="{{ $detail_product->product_id }}" />
@@ -24,7 +44,6 @@
                     </button>
                 </span>
             </form>
-
 
             <p><b>Danh mục:</b> {{ $detail_product->category_name }}</p>
             <p><b>Thương hiệu:</b> {{ $detail_product->brand_name }}</p>

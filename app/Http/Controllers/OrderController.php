@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 //order
 class OrderController extends Controller
 {
@@ -35,10 +38,21 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
         }
 
-        // Tính tổng tiền đơn hàng
+        // Tính tổng tiền đơn hàng và giảm giá
         $order_total = 0;
+        $discount_total = 0; // Tổng giá trị giảm giá
+
         foreach ($cart as $item) {
-            $order_total += $item['product_price'] * $item['quantity'];
+            // Tính giá sau giảm
+            $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
+            $total_price = $discount_price * $item['quantity'];
+
+            // Cộng tổng giá trị giảm giá
+            $discount_value = ($item['product_price'] - $discount_price) * $item['quantity'];
+            $discount_total += $discount_value;
+
+            // Cộng vào tổng tiền đơn hàng
+            $order_total += $total_price;
         }
 
         // Thêm thông tin thanh toán
@@ -71,6 +85,7 @@ class OrderController extends Controller
 
         // Xóa giỏ hàng trong session sau khi đặt hàng
         Session::forget('cart');
+
         // Điều hướng sau khi đặt hàng
         if ($payment_method == 'bằng thẻ') {
             return redirect('/payment-card');
@@ -78,6 +93,7 @@ class OrderController extends Controller
             return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
         }
     }
+
     public function thank_you()
     {
         $categories = DB::table('tbl_category_product')
@@ -125,6 +141,51 @@ class OrderController extends Controller
 
         ]);;
     }
+    // public function orderDetail($order_id)
+    // {
+    //     $categories = DB::table('tbl_category_product')
+    //         ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+    //         ->orderBy('category_id', 'desc')
+    //         ->get();
+
+    //     $brands = DB::table('tbl_brand')
+    //         ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+    //         ->orderBy('brand_id', 'desc')
+    //         ->get();
+
+    //     $customer_id = Session::get('customer_id');
+
+    //     // Lấy thông tin đơn hàng
+    //     $order = DB::table('tbl_order')
+    //         ->where('order_id', $order_id)
+    //         ->where('customer_id', $customer_id)
+    //         ->first();
+
+    //     // Nếu không tìm thấy đơn hàng, redirect đến lịch sử đơn hàng
+    //     if (!$order) {
+    //         return redirect('/order-history')->with('error', 'Đơn hàng không tồn tại.');
+    //     }
+
+    //     // Lấy chi tiết sản phẩm trong đơn hàng
+    //     $order_details = DB::table('tbl_order_detail')
+    //         ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
+    //         ->where('order_id', $order_id)
+    //         ->select('tbl_order_detail.*', 'tbl_product.product_name', 'tbl_product.product_image')
+    //         ->get();
+
+    //     // Kiểm tra trạng thái đơn hàng, cập nhật nếu cần
+    //     if ($order->order_status != $order->status) {
+    //         DB::table('tbl_order')
+    //             ->where('order_id', $order_id)
+    //             ->update(['order_status' => $order->status]); // Cập nhật trạng thái
+    //     }
+
+    //     // Trả về view chi tiết đơn hàng
+    //     return view('pages.order.detail', compact('order', 'order_details'))->with([
+    //         'categories' => $categories, // Truyền đúng biến
+    //         'brands' => $brands,
+    //     ]);
+    // }
     public function orderDetail($order_id)
     {
         $categories = DB::table('tbl_category_product')
@@ -136,27 +197,161 @@ class OrderController extends Controller
             ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
             ->orderBy('brand_id', 'desc')
             ->get();
+        // Kiểm tra xem người dùng đã đăng nhập chưa
         $customer_id = Session::get('customer_id');
+        if (!$customer_id) {
+            return redirect('/login')->with('error', 'Vui lòng đăng nhập để xem chi tiết đơn hàng');
+        }
 
+        // Lấy thông tin đơn hàng cho khách hàng
         $order = DB::table('tbl_order')
             ->where('order_id', $order_id)
             ->where('customer_id', $customer_id)
             ->first();
 
+        // Nếu không tìm thấy đơn hàng
         if (!$order) {
             return redirect('/order-history')->with('error', 'Đơn hàng không tồn tại.');
         }
 
+        // Lấy chi tiết sản phẩm trong đơn hàng
         $order_details = DB::table('tbl_order_detail')
             ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
             ->where('order_id', $order_id)
             ->select('tbl_order_detail.*', 'tbl_product.product_name', 'tbl_product.product_image')
             ->get();
 
+        // Trả về view chi tiết đơn hàng
         return view('pages.order.detail', compact('order', 'order_details'))->with([
             'categories' => $categories, // Truyền đúng biến
             'brands' => $brands,
+        ]);
+    }
 
-        ]);;;
+
+    public function manage_order()
+    {
+        $all_orders = DB::table('tbl_order')
+            ->join('tbl_customer', 'tbl_order.customer_id', '=', 'tbl_customer.customer_id')
+            ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id') // Thêm dòng này
+            ->select(
+                'tbl_order.*',
+                'tbl_customer.customer_name',
+                'tbl_payment.payment_method' // Lấy phương thức thanh toán
+            )
+            ->orderBy('tbl_order.order_id', 'desc')
+            ->get();
+
+        return view('admin.manage_order')->with('all_orders', $all_orders);
+    }
+
+
+    public function view_order($orderId)
+    {
+        $order_details = DB::table('tbl_order')
+            ->join('tbl_customer', 'tbl_order.customer_id', '=', 'tbl_customer.customer_id')
+            ->join('tbl_shipping', 'tbl_order.shipping_id', '=', 'tbl_shipping.shipping_id')
+            ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id')
+            ->join('tbl_order_detail', 'tbl_order.order_id', '=', 'tbl_order_detail.order_id')
+            ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
+            ->where('tbl_order.order_id', $orderId)
+            ->select(
+                'tbl_order.*',
+                'tbl_customer.*',
+                'tbl_shipping.*',
+                'tbl_payment.*',
+                'tbl_order_detail.*',
+                'tbl_product.product_name'
+            )
+            ->get();
+
+        $order = $order_details->first(); // để hiển thị chung
+        return view('admin.view_order')->with([
+            'order_details' => $order_details,
+            'order' => $order
+        ]);
+    }
+    // public function updateOrderStatus(Request $request, $orderId)
+    // {
+    //     // Validate trạng thái đơn hàng
+    //     $request->validate([
+    //         'order_status' => 'required|in:Đang xử lý,Hoàn thành,Đã hủy',
+    //     ]);
+
+    //     // Cập nhật trạng thái đơn hàng
+    //     DB::table('tbl_order')
+    //         ->where('order_id', $orderId)
+    //         ->update([
+    //             'order_status' => $request->order_status,
+    //         ]);
+
+    //     // Thông báo cập nhật thành công
+    //     return redirect()->back()->with('message', 'Cập nhật trạng thái đơn hàng thành công');
+    // }
+    public function updateOrderStatus(Request $request, $orderId)
+    {
+        // Validate trạng thái đơn hàng
+        $request->validate([
+            'order_status' => 'required|in:Đang xử lý,Hoàn thành,Đã hủy',
+        ]);
+
+        // Cập nhật trạng thái đơn hàng
+        DB::table('tbl_order')
+            ->where('order_id', $orderId)
+            ->update([
+                'order_status' => $request->order_status,
+            ]);
+
+        // Thông báo cập nhật thành công
+        return redirect()->back()->with('message', 'Cập nhật trạng thái đơn hàng thành công');
+    }
+
+    // in hóa đơn
+
+
+    public function print_invoice($orderId)
+    {
+        // Lấy dữ liệu đơn hàng và chi tiết sản phẩm
+        $order = DB::table('tbl_order')
+            ->join('tbl_customer', 'tbl_order.customer_id', '=', 'tbl_customer.customer_id')
+            ->join('tbl_shipping', 'tbl_order.shipping_id', '=', 'tbl_shipping.shipping_id')
+            ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id')
+            ->select(
+                'tbl_order.*',
+                'tbl_customer.customer_name',
+                'tbl_customer.customer_email',
+                'tbl_customer.customer_phone',
+                'tbl_shipping.shipping_name',
+                'tbl_shipping.shipping_address',
+                'tbl_shipping.shipping_phone',
+                'tbl_payment.payment_method',
+                'tbl_payment.payment_status'
+            )
+            ->where('tbl_order.order_id', $orderId)
+            ->first();
+
+        $order_details = DB::table('tbl_order_detail')
+            ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
+            ->where('tbl_order_detail.order_id', $orderId)
+            ->select('tbl_order_detail.*', 'tbl_product.product_name')
+            ->get();
+
+        // Khởi tạo Dompdf
+        $dompdf = new Dompdf();
+
+        // Tạo nội dung HTML cho hóa đơn
+        $html = view('admin.print_invoice', compact('order', 'order_details'))->render();
+
+        // Load HTML vào Dompdf
+        $dompdf->loadHtml($html);
+
+        // Đặt kích thước và chế độ giấy
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Tạo file PDF
+        $dompdf->render();
+
+        // Xuất file PDF ra trình duyệt
+        return $dompdf->stream('invoice_' . $order->order_id . '.pdf');
     }
 }
