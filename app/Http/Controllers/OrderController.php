@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderSuccessMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Mail;
+
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -156,7 +159,16 @@ class OrderController extends Controller
                 'created_at' => Carbon::now(),
             ]);
         }
+        //phần thêm vào
+        $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+        if ($customer_email) {
+            $orderInfo = [  // Pass any order-related info to the email
+                'order_id' => $order_id,
+                'order_total' => $order_total,
+            ];
 
+            Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+        }
         // Xóa giỏ hàng trong session sau khi đặt hàng
         Session::forget('cart');
 
@@ -167,6 +179,78 @@ class OrderController extends Controller
             return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
         }
     }
+
+
+    //order mail
+
+    // public function order_place(Request $request)
+    // {
+    //     $payment_method = $request->input('payment_option');
+
+    //     // Kiểm tra người dùng có đăng nhập không
+    //     $customer_id = Session::get('customer_id');
+    //     if (!$customer_id) {
+    //         return redirect()->back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
+    //     }
+
+    //     // Kiểm tra địa chỉ giao hàng có tồn tại không
+    //     $shipping_id = Session::get('shipping_id');
+    //     if (!$shipping_id) {
+    //         return redirect()->back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
+    //     }
+
+    //     // Lấy giỏ hàng từ Session
+    //     $cart = Session::get('cart', []);
+
+    //     if (empty($cart)) {
+    //         return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
+    //     }
+
+    //     // Tính tổng tiền đơn hàng mà không tính giảm giá
+    //     $order_total = 0;
+
+    //     foreach ($cart as $item) {
+    //         $total_price = $item['product_price'] * $item['quantity'];
+    //         $order_total += $total_price;
+    //     }
+
+    //     // Thêm thông tin thanh toán
+    //     $payment_id = DB::table('tbl_payment')->insertGetId([
+    //         'payment_method' => $payment_method,
+    //         'payment_status' => 'Đang chờ xử lý',
+    //         'created_at' => Carbon::now(),
+    //     ]);
+
+    //     // Thêm đơn hàng vào bảng tbl_order
+    //     $order_id = DB::table('tbl_order')->insertGetId([
+    //         'customer_id' => $customer_id,
+    //         'shipping_id' => $shipping_id,
+    //         'payment_id' => $payment_id,
+    //         'order_total' => $order_total,
+    //         'order_status' => 'Đang xử lý',
+    //         'created_at' => Carbon::now(),
+    //     ]);
+
+    //     // Lấy email khách hàng
+    //     $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+
+    //     // Gửi email thông báo đơn hàng thành công
+    //     if ($customer_email) {
+    //         $orderInfo = [  // Pass any order-related info to the email
+    //             'order_id' => $order_id,
+    //             'order_total' => $order_total,
+    //         ];
+
+    //         Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+    //     }
+
+    //     // Xóa giỏ hàng trong session sau khi đặt hàng
+    //     Session::forget('cart');
+
+    //     // Điều hướng sau khi đặt hàng
+    //     return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
+    // }
+
 
 
     public function thank_you()

@@ -118,3 +118,5 @@ Route::post('/update-order-status/{orderId}', [OrderController::class, 'updateOr
 
 //in hoa đơn
 Route::get('/print-invoice/{orderId}', [OrderController::class, 'print_invoice']);
+//đánh giá sản phẩm
+Route::post('/review/store/{product_id}', [ProductController::class, 'store'])->name('review.store');

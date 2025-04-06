@@ -136,9 +136,6 @@ class ProductController extends Controller
         return redirect('/all-Product')->with('message', 'Sản phẩm đã bị ẩn!');
     }
     //detail product
-
-
-
     public function details_product($id)
     {
         // Lấy danh mục sản phẩm
@@ -167,11 +164,50 @@ class ProductController extends Controller
             ->limit(6) // Giới hạn số lượng sản phẩm hiển thị
             ->get();
 
+        $reviews = DB::table('tbl_product_reviews')
+            ->join('tbl_customer', 'tbl_product_reviews.customer_id', '=', 'tbl_customer.customer_id')
+            ->where('product_id', $id)
+            ->select('tbl_product_reviews.*', 'tbl_customer.customer_name')
+            ->orderBy('tbl_product_reviews.created_at', 'desc')
+            ->get();
+
+
         return view('pages.sanpham.show_detail')->with([
             'categories' => $categories,
             'brands' => $brands,
             'detail_product' => $detail_product, // Truyền sản phẩm vào View
-            'related_products' => $related_products
+            'related_products' => $related_products,
+            'tbl_product_reviews' => $reviews,
         ]);
+    }
+
+    //đánh giá sao
+    public function store(Request $request, $product_id)
+    {
+        // Lấy thông tin khách hàng từ session
+        $customer_id = Session::get('customer_id');
+
+        if (!$customer_id) {
+            return redirect('/customer/login')->with('message', 'Bạn cần phải đăng nhập');
+        }
+
+        // Giả sử khách đã mua sản phẩm, kiểm tra thực tế tùy bạn
+        $hasPurchased = true;
+
+        if (!$hasPurchased) {
+            return redirect()->back()->with('error', 'Bạn cần mua sản phẩm này trước khi đánh giá!');
+        }
+
+        // Lưu vào bảng reviews
+        DB::table('tbl_product_reviews')->insert([
+            'product_id' => $product_id,
+            'customer_id' => $customer_id,
+            'rating' => $request->input('rating'),
+            'comment' => $request->input('comment'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Đánh giá của bạn đã được gửi!');
     }
 }
