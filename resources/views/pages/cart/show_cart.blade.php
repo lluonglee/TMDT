@@ -28,8 +28,8 @@
 
                     @foreach(Session::get('cart') as $item)
                     @php
-                    $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
-                    $total_price = $discount_price * $item['quantity'];
+                    // Bỏ tính giá giảm giá, chỉ sử dụng giá gốc
+                    $total_price = $item['product_price'] * $item['quantity'];
                     $subtotal += $total_price;
                     @endphp
                     <tr>
@@ -45,16 +45,7 @@
                             <p>ID: {{ $item['product_id'] }}</p>
                         </td>
                         <td class="cart_price">
-                            @if(isset($item['discount']) && $item['discount'] > 0)
-                            <p style="text-decoration: line-through; color: red;">
-                                {{ number_format($item['product_price'], 0, ',', '.') }} VNĐ
-                            </p>
-                            <p style="color: green; font-weight: bold;">
-                                {{ number_format($discount_price, 0, ',', '.') }} VNĐ
-                            </p>
-                            @else
                             <p>{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</p>
-                            @endif
                         </td>
                         <td class="cart_quantity">
                             <form action="{{ URL::to('/update-cart') }}" method="POST">
@@ -90,8 +81,6 @@
                     </tr>
                     @endif
                 </tbody>
-
-
             </table>
         </div>
     </div>
@@ -111,9 +100,19 @@
                     <ul>
                         <li>Tổng <span>{{ number_format($subtotal, 0, ',', '.') }} VNĐ</span></li>
 
+                        @php
+                        // Định nghĩa phí vận chuyển (ví dụ giả định là 0 hoặc lấy từ session)
+                        $shipping_fee = Session::get('shipping_fee', 0);
+                        @endphp
+
                         <li>Phí vận chuyển
-                            <span>{{ $shipping_fee > 0 ? number_format($shipping_fee, 0, ',', '.') . ' VNĐ' : 'Free' }}</span>
+                            <span>{{ $shipping_fee > 0 ? number_format($shipping_fee, 0, ',', '.') . ' VNĐ' : 'Miễn phí' }}</span>
                         </li>
+
+                        @php
+                        $total = $subtotal + $shipping_fee;
+                        @endphp
+
                         <li>Thành tiền <span>{{ number_format($total, 0, ',', '.') }} VNĐ</span></li>
                     </ul>
 
@@ -126,7 +125,6 @@
                     @else
                     <li><a href="{{URL('/customer/login')}}"><i class="fa fa-lock"></i> Đăng nhập để thanh toán</a></li>
                     @endif
-
 
                 </div>
             </div>

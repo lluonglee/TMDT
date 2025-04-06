@@ -9,7 +9,6 @@
             </ol>
         </div>
         <!--/breadcrums-->
-
         <div class="review-payment">
             <h2>Xem lại giỏ hàng</h2>
         </div>
@@ -34,8 +33,8 @@
 
                     @foreach(Session::get('cart') as $item)
                     @php
-                    $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
-                    $total_price = $discount_price * $item['quantity'];
+                    // Bỏ tính toán giảm giá, chỉ sử dụng giá gốc
+                    $total_price = $item['product_price'] * $item['quantity'];
                     $subtotal += $total_price;
                     @endphp
                     <tr>
@@ -51,16 +50,8 @@
                             <p>ID: {{ $item['product_id'] }}</p>
                         </td>
                         <td class="cart_price">
-                            @if(isset($item['discount']) && $item['discount'] > 0)
-                            <p style="text-decoration: line-through; color: red;">
-                                {{ number_format($item['product_price'], 0, ',', '.') }} VNĐ
-                            </p>
-                            <p style="color: green; font-weight: bold;">
-                                {{ number_format($discount_price, 0, ',', '.') }} VNĐ
-                            </p>
-                            @else
+                            <!-- Hiển thị giá gốc mà không tính giảm giá -->
                             <p>{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</p>
-                            @endif
                         </td>
                         <td class="cart_quantity">
                             <form action="{{ URL::to('/update-cart') }}" method="POST">

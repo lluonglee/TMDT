@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('tbl_customer', function (Blueprint $table) {
             $table->id('customer_id'); // ✅ BIGINT UNSIGNED AUTO_INCREMENT
             $table->string('customer_name');
-            $table->string('customer_email');
+            $table->string('customer_email')->unique(); // ✅ Thêm ràng buộc unique
             $table->string('customer_password');
             $table->string('customer_phone');
+            $table->tinyInteger('status')->default(1); // 1: hoạt động, 0: bị khóa
             $table->timestamps();
         });
     }

@@ -15,6 +15,85 @@ use Dompdf\Options;
 class OrderController extends Controller
 {
     //
+    // public function order_place(Request $request)
+    // {
+    //     $payment_method = $request->input('payment_option');
+
+    //     // Kiểm tra người dùng có đăng nhập không
+    //     $customer_id = Session::get('customer_id');
+    //     if (!$customer_id) {
+    //         return redirect()->back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
+    //     }
+
+    //     // Kiểm tra địa chỉ giao hàng có tồn tại không
+    //     $shipping_id = Session::get('shipping_id');
+    //     if (!$shipping_id) {
+    //         return redirect()->back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
+    //     }
+
+    //     // Lấy giỏ hàng từ Session
+    //     $cart = Session::get('cart', []);
+
+    //     if (empty($cart)) {
+    //         return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
+    //     }
+
+    //     // Tính tổng tiền đơn hàng và giảm giá
+    //     $order_total = 0;
+    //     $discount_total = 0; // Tổng giá trị giảm giá
+
+    //     foreach ($cart as $item) {
+    //         // Tính giá sau giảm
+    //         $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
+    //         $total_price = $discount_price * $item['quantity'];
+
+    //         // Cộng tổng giá trị giảm giá
+    //         $discount_value = ($item['product_price'] - $discount_price) * $item['quantity'];
+    //         $discount_total += $discount_value;
+
+    //         // Cộng vào tổng tiền đơn hàng
+    //         $order_total += $total_price;
+    //     }
+
+    //     // Thêm thông tin thanh toán
+    //     $payment_id = DB::table('tbl_payment')->insertGetId([
+    //         'payment_method' => $payment_method,
+    //         'payment_status' => 'Đang chờ xử lý',
+    //         'created_at' => Carbon::now(),
+    //     ]);
+
+    //     // Thêm đơn hàng vào bảng tbl_order
+    //     $order_id = DB::table('tbl_order')->insertGetId([
+    //         'customer_id' => $customer_id,
+    //         'shipping_id' => $shipping_id,
+    //         'payment_id' => $payment_id,
+    //         'order_total' => $order_total,
+    //         'order_status' => 'Đang xử lý',
+    //         'created_at' => Carbon::now(),
+    //     ]);
+
+    //     // Thêm dữ liệu vào bảng tbl_order_detail từ giỏ hàng session
+    //     foreach ($cart as $item) {
+    //         DB::table('tbl_order_detail')->insert([
+    //             'order_id' => $order_id,
+    //             'product_id' => $item['product_id'],
+    //             'product_quantity' => $item['quantity'],
+    //             'product_price' => $item['product_price'],
+    //             'created_at' => Carbon::now(),
+    //         ]);
+    //     }
+
+    //     // Xóa giỏ hàng trong session sau khi đặt hàng
+    //     Session::forget('cart');
+
+    //     // Điều hướng sau khi đặt hàng
+    //     if ($payment_method == 'bằng thẻ') {
+    //         return redirect('/payment-card');
+    //     } else {
+    //         return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
+    //     }
+    // }
+
     public function order_place(Request $request)
     {
         $payment_method = $request->input('payment_option');
@@ -38,18 +117,13 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
         }
 
-        // Tính tổng tiền đơn hàng và giảm giá
+        // Tính tổng tiền đơn hàng mà không tính giảm giá
         $order_total = 0;
-        $discount_total = 0; // Tổng giá trị giảm giá
+        $discount_total = 0; // Tổng giá trị giảm giá (sẽ bỏ qua)
 
         foreach ($cart as $item) {
-            // Tính giá sau giảm
-            $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
-            $total_price = $discount_price * $item['quantity'];
-
-            // Cộng tổng giá trị giảm giá
-            $discount_value = ($item['product_price'] - $discount_price) * $item['quantity'];
-            $discount_total += $discount_value;
+            // Sử dụng giá gốc thay vì giá sau giảm
+            $total_price = $item['product_price'] * $item['quantity'];
 
             // Cộng vào tổng tiền đơn hàng
             $order_total += $total_price;
@@ -93,6 +167,7 @@ class OrderController extends Controller
             return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
         }
     }
+
 
     public function thank_you()
     {

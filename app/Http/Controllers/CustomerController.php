@@ -41,23 +41,81 @@ class CustomerController extends Controller
     }
 
     // Xử lý đăng nhập khách hàng
+    // public function login(Request $request)
+    // {
+    //     $email = $request->input('email_account');
+    //     $password = $request->input('password_account');
+
+    //     $customer = DB::table('tbl_customer')
+    //         ->where('customer_email', $email)
+    //         ->first();
+
+    //     if ($customer && Hash::check($password, $customer->customer_password)) {
+    //         Session::put('customer_id', $customer->customer_id);
+    //         Session::put('customer_name', $customer->customer_name);
+    //         return Redirect::to('/checkout');
+    //     } else {
+    //         return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu!');
+    //     }
+    // }
     public function login(Request $request)
     {
         $email = $request->input('email_account');
         $password = $request->input('password_account');
 
+        $admin_email = $request->input('email_account');
+        $admin_password = md5($request->input('password_account'));
+
+        $employee = DB::table('tbl_employee')
+            ->where('employee_email', $email)
+            ->first();
+
         $customer = DB::table('tbl_customer')
             ->where('customer_email', $email)
             ->first();
 
-        if ($customer && Hash::check($password, $customer->customer_password)) {
-            Session::put('customer_id', $customer->customer_id);
-            Session::put('customer_name', $customer->customer_name);
-            return Redirect::to('/checkout');
-        } else {
-            return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu!');
+        $admin = DB::table('tbl_admin')
+            ->where('admin_email', $admin_email)
+            ->where('admin_password', $admin_password)
+            ->first();
+
+
+
+        if ($employee) {
+            if ($employee->status == 0) {
+                return Redirect::to('/customer/login')->with('error', 'Tài khoản của bạn đã bị khóa.');
+            }
+
+            if (Hash::check($password, $employee->employee_password)) {
+                Session::put('employee_id', $employee->employee_id);
+                Session::put('employee_name', $employee->employee_name);
+                Session::put('role', $employee->role);
+                return Redirect::to('/dashboard');
+            }
         }
+
+        if ($customer) {
+            if ($customer->status == 0) {
+                return Redirect::to('/customer/login')->with('error', 'Tài khoản của bạn đã bị khóa.');
+            }
+
+            if (Hash::check($password, $customer->customer_password)) {
+                Session::put('customer_id', $customer->customer_id);
+                Session::put('customer_name', $customer->customer_name);
+                return Redirect::to('/checkout');
+            }
+        }
+        if ($admin) {
+            Session::put('admin_name', $admin->admin_name);
+            Session::put('admin_id', $admin->admin_id);
+            return Redirect::to('/dashboard');
+        }
+
+        return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu!');
     }
+
+
+
 
     public function check_out()
     {

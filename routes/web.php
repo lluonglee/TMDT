@@ -8,6 +8,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryProduct;
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 
@@ -30,6 +31,24 @@ Route::get('/admin', [AdminController::class, 'index']);
 Route::get('/dashboard', [AdminController::class, 'show_dashboard']);
 Route::get('/logout', [AdminController::class, 'logout']);
 Route::post('/admin-dashboard', [AdminController::class, 'dashboard']);
+
+
+//employee 
+Route::get('/employees', [EmployeeController::class, 'list_employee']);
+Route::get('/employees-create', [EmployeeController::class, 'store_create']); // Trang tạo nhân viên
+Route::post('/employees-store', [EmployeeController::class, 'store']); // Xử lý form tạo nhân viên
+Route::post('/employees/lock/{id}', [EmployeeController::class, 'lock']);
+Route::post('/employees/unlock/{id}', [EmployeeController::class, 'unlock']);
+Route::delete('/employees-destroy/{id}', [EmployeeController::class, 'destroy']);
+Route::get('/employees/edit/{id}', [EmployeeController::class, 'edit_employee']);
+Route::post('/employees-update/{id}', [EmployeeController::class, 'update']);
+
+
+//tai khoan nguoi dung
+Route::get('/customers-list', [AdminController::class, 'listCustomers']);
+Route::post('/customers/lock/{id}', [AdminController::class, 'lock_customer']);
+Route::post('/customers/unlock/{id}', [AdminController::class, 'unlock_customer']);
+Route::post('/customers/delete/{id}', [AdminController::class, 'delete_customer']);
 
 //category Product
 Route::get('/add-Category-Product', [CategoryProduct::class, 'add_Category_Product']);
