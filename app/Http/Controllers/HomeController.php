@@ -36,7 +36,7 @@ class HomeController extends Controller
         $all_product = DB::table('tbl_product')
             ->where('product_status', '1') // Chỉ lấy thương hiệu đang hiển thị
             ->orderBy('product_id', 'desc')
-            ->Limit(4)
+            // ->Limit(5)
             ->get();
 
         return view('pages.home')->with([

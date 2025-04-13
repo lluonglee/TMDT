@@ -23,7 +23,66 @@
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="images/ico/apple-touch-icon-144-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="images/ico/apple-touch-icon-114-precomposed.png">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="images/ico/apple-touch-icon-72-precomposed.png">
+
     <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
+    <style>
+    /* Phần input tìm kiếm */
+    /* Phần input tìm kiếm */
+    .col-sm-3 form input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #fff;
+        /* Màu đỏ */
+        border-radius: 5px;
+        font-size: 16px;
+        color: #333;
+        background-color: #fff;
+        /* Nền trắng */
+        outline: none;
+        transition: border-color 0.3s ease-in-out;
+    }
+
+    .col-sm-3 form input[type="text"]:focus {
+        border-color: #c9302c;
+        /* Đổi màu viền khi focus (đỏ đậm hơn) */
+    }
+
+    /* Phần nút tìm kiếm */
+    .col-sm-3 form button {
+        padding: 10px 15px;
+        margin-left: 10px;
+        background-color: #d9534f;
+        /* Màu đỏ */
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: flex;
+        /* Căn chỉnh icon và văn bản nằm ngang */
+        align-items: center;
+        /* Căn giữa icon và văn bản theo chiều dọc */
+    }
+
+    .col-sm-3 form button:hover {
+        background-color: #c9302c;
+        /* Đổi màu khi hover (đỏ đậm hơn) */
+    }
+
+    .form-flex {
+        display: flex;
+    }
+
+
+
+    /* Icon tìm kiếm */
+    .col-sm-3 form button i {
+        font-size: 18px;
+        margin-right: 5px;
+        /* Tạo khoảng cách giữa icon và văn bản */
+    }
+    </style>
 </head>
 <!--/head-->
 
@@ -67,7 +126,8 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="logo pull-left">
-                            <a href="index.html"><img src="{{('public/frontend/images/logo.png')}}" alt="" /></a>
+                            <a href="{{URL('/')}}"><img style="width: 100px; height: 50px; object-fit: cover;"
+                                    src="{{('public/frontend/images/logo3.png')}}" alt="" /></a>
                         </div>
                         <div class="btn-group pull-right">
                             <div class="btn-group">
@@ -150,7 +210,7 @@
                                 <span class="icon-bar"></span>
                             </button>
                         </div>
-                        <div class="mainmenu pull-left">
+                        <!-- <div class="mainmenu pull-left">
                             <ul class="nav navbar-nav collapse navbar-collapse">
                                 <li><a href="{{ url('/trang-chu') }}" class="active">Trang Chủ</a></li>
                                 <li class="dropdown"><a href="#">Sản phẩm<i class="fa fa-angle-down"></i></a>
@@ -165,13 +225,17 @@
                                 <li><a href="404.html">Giỏ hàng</a></li>
                                 <li><a href="contact-us.html">Liên hệ</a></li>
                             </ul>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-sm-3">
                         <form action="{{ url('/tim-kiem') }}" method="POST">
                             @csrf
-                            <input type="text" name="keywords" placeholder="Tìm kiếm sản phẩm..." required>
-                            <button type="submit"><i class="fa fa-search"></i></button>
+                            <div class="form-flex">
+                                <input type="text" name="keywords" placeholder="Tìm kiếm sản phẩm..." required>
+                                <button type="submit"><i class="fa fa-search"></i></button>
+
+                            </div>
+
                         </form>
 
                     </div>
@@ -197,44 +261,52 @@
                         <div class="carousel-inner">
                             <div class="item active">
                                 <div class="col-sm-6">
-                                    <h1><span>E</span>-SHOPPER</h1>
-                                    <h2>Free E-Commerce Template</h2>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. </p>
-                                    <button type="button" class="btn btn-default get">Get it now</button>
+                                    <h1><span style="color: #AFEEEE;">LOCAL</span>-BRAND</h1>
+                                    <h2>Shop Authentic Local Fashion</h2>
+                                    <p>Khám phá các sản phẩm thời trang độc đáo từ các thương hiệu nội địa. Chúng tôi
+                                        mang đến những thiết kế sáng tạo, chất lượng cao, hoàn hảo cho phong cách sống
+                                        hiện đại. Hãy tạo nên dấu ấn riêng với những món đồ đặc biệt từ Local Brand.</p>
+                                    <button type="button" style="background-color: #d9534f;"
+                                        class="btn btn-default get">Mua ngay</button>
                                 </div>
+
                                 <div class="col-sm-6">
-                                    <img src="{{('public/frontend/girl1.jpg')}}" class="girl img-responsive" alt="" />
-                                    <img src="{{('public/frontend/pricing.png')}}" class="pricing" alt="" />
+                                    <img src="{{('public/frontend/images/slide4.webp')}}" class="girl img-responsive"
+                                        alt="" />
+
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="col-sm-6">
-                                    <h1><span>E</span>-SHOPPER</h1>
-                                    <h2>100% Responsive Design</h2>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. </p>
-                                    <button type="button" class="btn btn-default get">Get it now</button>
+                                    <h1><span style="color: #AFEEEE;">LOCAL</span>-BRAND</h1>
+                                    <h2>Shop Authentic Local Fashion</h2>
+                                    <p>Khám phá các sản phẩm thời trang độc đáo từ các thương hiệu nội địa. Chúng tôi
+                                        mang đến những thiết kế sáng tạo, chất lượng cao, hoàn hảo cho phong cách sống
+                                        hiện đại. Hãy tạo nên dấu ấn riêng với những món đồ đặc biệt từ Local Brand.</p>
+                                    <button type="button" style="background-color: #d9534f;"
+                                        class="btn btn-default get">Mua ngay</button>
                                 </div>
                                 <div class="col-sm-6">
-                                    <img src="{{('public/frontend/images/girl2.jpg')}}" class="girl img-responsive"
+                                    <img src="{{('public/frontend/images/slide1.jfif')}}" class="girl img-responsive"
                                         alt="" />
-                                    <img src="{{('public/frontend/images/pricing.png')}}" class="pricing" alt="" />
+
                                 </div>
                             </div>
 
                             <div class="item">
                                 <div class="col-sm-6">
-                                    <h1><span>E</span>-SHOPPER</h1>
-                                    <h2>Free Ecommerce Template</h2>
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-                                        incididunt ut labore et dolore magna aliqua. </p>
-                                    <button type="button" class="btn btn-default get">Get it now</button>
+                                    <h1><span style="color: #AFEEEE;">LOCAL</span>-BRAND</h1>
+                                    <h2>Shop Authentic Local Fashion</h2>
+                                    <p>Khám phá các sản phẩm thời trang độc đáo từ các thương hiệu nội địa. Chúng tôi
+                                        mang đến những thiết kế sáng tạo, chất lượng cao, hoàn hảo cho phong cách sống
+                                        hiện đại. Hãy tạo nên dấu ấn riêng với những món đồ đặc biệt từ Local Brand.</p>
+                                    <button type="button" style="background-color: #d9534f;"
+                                        class="btn btn-default get">Mua ngay</button>
                                 </div>
                                 <div class="col-sm-6">
-                                    <img src="{{('public/frontend/images/girl3.jpg')}}" class="girl img-responsive"
+                                    <img src="{{('public/frontend/images/slide2.webp')}}" class="girl img-responsive"
                                         alt="" />
-                                    <img src="{{('public/frontend/images/pricing.png')}}" class="pricing" alt="" />
+
                                 </div>
                             </div>
 
@@ -259,7 +331,7 @@
             <div class="row">
                 <div class="col-sm-3">
                     <div class="left-sidebar">
-                        <h2>Danh mục Sản phẩm</h2>
+                        <h2 style="color: #d9534f;">Danh mục Sản phẩm</h2>
                         @foreach($categories as $category)
                         <div class="panel-group category-products" id="accordian">
                             <!--category-productsr-->
@@ -277,7 +349,7 @@
 
                         <div class="brands_products">
                             <!--brands_products-->
-                            <h2>Thương Hiệu sản phẩm</h2>
+                            <h2 style="color: #d9534f;">Thương Hiệu sản phẩm</h2>
                             <div class="brands-name">
 
                                 <ul class="nav nav-pills nav-stacked">
@@ -325,85 +397,7 @@
 
     <footer id="footer">
         <!--Footer-->
-        <div class="footer-top">
-            <div class="container">
-                <div class="row">
-                    <div class="col-sm-2">
-                        <div class="companyinfo">
-                            <h2><span>e</span>-shopper</h2>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit,sed do eiusmod tempor</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-7">
-                        <div class="col-sm-3">
-                            <div class="video-gallery text-center">
-                                <a href="#">
-                                    <div class="iframe-img">
-                                        <img src="{{('public/frontend/images/iframe1.png')}}" alt="" />
-                                    </div>
-                                    <div class="overlay-icon">
-                                        <i class="fa fa-play-circle-o"></i>
-                                    </div>
-                                </a>
-                                <p>Circle of Hands</p>
-                                <h2>24 DEC 2014</h2>
-                            </div>
-                        </div>
 
-                        <div class="col-sm-3">
-                            <div class="video-gallery text-center">
-                                <a href="#">
-                                    <div class="iframe-img">
-                                        <img src="{{('public/frontend/images/iframe2.png')}}" alt="" />
-                                    </div>
-                                    <div class="overlay-icon">
-                                        <i class="fa fa-play-circle-o"></i>
-                                    </div>
-                                </a>
-                                <p>Circle of Hands</p>
-                                <h2>24 DEC 2014</h2>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <div class="video-gallery text-center">
-                                <a href="#">
-                                    <div class="iframe-img">
-                                        <img src="{{('public/frontend/images/iframe3.png')}}" alt="" />
-                                    </div>
-                                    <div class="overlay-icon">
-                                        <i class="fa fa-play-circle-o"></i>
-                                    </div>
-                                </a>
-                                <p>Circle of Hands</p>
-                                <h2>24 DEC 2014</h2>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-3">
-                            <div class="video-gallery text-center">
-                                <a href="#">
-                                    <div class="iframe-img">
-                                        <img src="{{('public/frontend/images/iframe4.png')}}" alt="" />
-                                    </div>
-                                    <div class="overlay-icon">
-                                        <i class="fa fa-play-circle-o"></i>
-                                    </div>
-                                </a>
-                                <p>Circle of Hands</p>
-                                <h2>24 DEC 2014</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="address">
-                            <img src="{{('public/frontend/')}}map.png" alt="" />
-                            <p>505 S Atlantic Ave Virginia Beach, VA(Virginia)</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="footer-widget">
             <div class="container">
@@ -475,9 +469,7 @@
         <div class="footer-bottom">
             <div class="container">
                 <div class="row">
-                    <p class="pull-left">Copyright © 2013 E-SHOPPER Inc. All rights reserved.</p>
-                    <p class="pull-right">Designed by <span><a target="_blank"
-                                href="http://www.themeum.com">Themeum</a></span></p>
+
                 </div>
             </div>
         </div>

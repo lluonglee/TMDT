@@ -24,7 +24,9 @@
 
                         <div class="form-group">
                             <label>Danh Mục</label>
+
                             <select name="category_id" class="form-control">
+
                                 @foreach($categories as $category)
                                 <option value="{{ $category->category_id }}">{{ $category->category_name }}</option>
                                 @endforeach
@@ -34,6 +36,7 @@
                         <div class="form-group">
                             <label>Thương Hiệu</label>
                             <select name="brand_id" class="form-control">
+
                                 @foreach($brands as $brand)
                                 <option value="{{ $brand->brand_id }}">{{ $brand->brand_name }}</option>
                                 @endforeach

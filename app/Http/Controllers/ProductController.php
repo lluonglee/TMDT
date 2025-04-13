@@ -30,7 +30,7 @@ class ProductController extends Controller
     }
     public function all_Product()
     {
-        $this->AuthLogin();
+
         $all_product = DB::table('tbl_product')
             ->join('tbl_category_product', 'tbl_product.category_id', '=', 'tbl_category_product.category_id')
             ->join('tbl_brand', 'tbl_product.brand_id', '=', 'tbl_brand.brand_id')
@@ -43,6 +43,18 @@ class ProductController extends Controller
     public function save_Product(Request $request)
     {
         $this->AuthLogin();
+        $product_name = $request->product_name;
+        // Kiểm tra tên sản phẩm đã tồn tại chưa (không phân biệt hoa thường)
+        $exists = DB::table('tbl_product')
+            ->whereRaw('LOWER(product_name) = ?', [strtolower($product_name)])
+            ->exists();
+
+        if ($exists) {
+            return Redirect::to('/add-Product')->with('message', 'Tên sản phẩm đã tồn tại, vui lòng chọn tên khác!');
+        }
+
+
+
         $data = [
             'product_name' => $request->product_name,
             'category_id' => $request->category_id,

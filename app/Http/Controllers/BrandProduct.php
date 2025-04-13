@@ -44,6 +44,16 @@ class BrandProduct extends Controller
     public function save_Brand_Product(Request $request)
     {
         $this->AuthLogin();
+        $brand_name = $request->input('brand_product_name');
+
+        // Kiểm tra tên thương hiệu đã tồn tại chưa (không phân biệt hoa thường)
+        $exists = DB::table('tbl_brand')
+            ->whereRaw('LOWER(brand_name) = ?', [strtolower($brand_name)])
+            ->exists();
+
+        if ($exists) {
+            return Redirect::to('add-brand-Product')->with('message', 'Tên thương hiệu đã tồn tại, vui lòng chọn tên khác!');
+        }
         $data = [
             'brand_name' => $request->brand_product_name,
             'brand_desc' => $request->brand_product_desc,
@@ -53,6 +63,8 @@ class BrandProduct extends Controller
         DB::table('tbl_brand')->insert($data);
         return Redirect::to('all-brand-Product')->with('message', 'Thêm thương hiệu thành công!');
     }
+
+
     public function edit_Brand_Product($id)
     {
         $this->AuthLogin();

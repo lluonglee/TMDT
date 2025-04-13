@@ -13,18 +13,16 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     <meta name="keywords" content="Visitors Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
 Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
     <script type="application/x-javascript">
-    addEventListener("load", function() {
-        setTimeout(hideURLbar, 0);
-    }, false);
+        addEventListener("load", function() {
+            setTimeout(hideURLbar, 0);
+        }, false);
 
-    function hideURLbar() {
-        window.scrollTo(0, 1);
-    }
+        function hideURLbar() {
+            window.scrollTo(0, 1);
+        }
     </script>
     <!-- bootstrap-css -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-
-
 
 
 

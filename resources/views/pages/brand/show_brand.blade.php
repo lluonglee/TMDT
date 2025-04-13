@@ -11,16 +11,17 @@
             <div class="product-image-wrapper">
                 <div class="single-products">
                     <div class="productinfo text-center">
-                        <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}" />
+                        <img style=" width: 100%;height: 250px; object-fit: cover;"
+                            src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}" />
 
                         @if($product->discount > 0)
                         <h2>
                             <span style="text-decoration: line-through; color: red;">
-                                {{ number_format($product->product_price, 0, ',', '.') }} VNĐ
+                                Giá: {{ number_format($product->product_price, 0, ',', '.') }} VNĐ
                             </span>
                             <br>
                             <span style="color: green; font-weight: bold;">
-                                {{ number_format($discount_price, 0, ',', '.') }} VNĐ
+                                Còn: {{ number_format($discount_price, 0, ',', '.') }} VNĐ
                             </span>
                         </h2>
                         @else
@@ -28,9 +29,17 @@
                         @endif
 
                         <p>{{ $product->product_name }}</p>
-                        <a href="#" class="btn btn-default add-to-cart">
-                            <i class="fa fa-shopping-cart"></i>Thêm giỏ hàng
-                        </a>
+                        <form action="{{ URL('/save-cart') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="product_id_hidden" value="{{ $product->product_id }}">
+
+                            <!-- Ẩn input số lượng nhưng vẫn giữ giá trị mặc định là 1 -->
+                            <input type="hidden" name="qty" value="1">
+
+                            <button type="submit" class="btn btn-default add-to-cart">
+                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                            </button>
+                        </form>
                     </div>
                 </div>
                 <div class="choose">

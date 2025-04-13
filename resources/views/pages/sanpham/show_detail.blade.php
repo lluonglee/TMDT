@@ -5,7 +5,6 @@
     <div class="col-sm-5">
         <div class="view-product">
             <img src="{{ asset( $detail_product->product_image) }}" alt="{{  $detail_product->product_name }}" />
-            <h3>ZOOM</h3>
         </div>
     </div>
     <div class="col-sm-7">
@@ -56,9 +55,9 @@
 <div class="category-tab shop-details-tab">
     <!--category-tab-->
     <div class="col-sm-12">
-        <ul class="nav nav-tabs">
+        <ul style="background-color: #A52A2A;" class="nav nav-tabs">
             <li class="active"><a href="#details" data-toggle="tab">Chi tiết sản phẩm</a></li>
-            <li><a href="#companyprofile" data-toggle="tab">Hồ sơ công ty</a></li>
+
             <li><a href="#reviews" data-toggle="tab">đánh giá</a></li>
         </ul>
     </div>
@@ -68,22 +67,7 @@
             <p>{{ $detail_product->product_desc }}</p>
         </div>
 
-        <div class="tab-pane fade" id="companyprofile">
-            <div class="col-sm-3">
-                <div class="product-image-wrapper">
-                    <div class="single-products">
-                        <div class="productinfo text-center">
-                            <img src="images/home/gallery1.jpg" alt="" />
-                            <h2>$56</h2>
-                            <p>Easy Polo Black Edition</p>
-                            <button type="button" class="btn btn-default add-to-cart"><i
-                                    class="fa fa-shopping-cart"></i>Add to cart</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-        </div>
 
 
         <div class="tab-pane fade in" id="reviews">
@@ -105,6 +89,29 @@
 
                 <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
             </form>
+            <hr>
+
+            <!-- Danh sách các đánh giá -->
+            <h4>Đánh giá sản phẩm:</h4>
+            @if ($tbl_product_reviews->isEmpty())
+            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+            @else
+            @foreach ($tbl_product_reviews as $review)
+            <div class="review mt-3 mb-3 p-2 border rounded">
+                <strong>{{ $review->customer_name }}</strong> -
+                <span>
+                    @for ($i = 1; $i <= 5; $i++) @if ($i <=$review->rating)
+                        ⭐
+                        @else
+                        ☆
+                        @endif
+                        @endfor
+                </span>
+                <p>{{ $review->comment }}</p>
+                <small class="text-muted">{{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y H:i') }}</small>
+            </div>
+            @endforeach
+            @endif
         </div>
 
     </div>
@@ -123,7 +130,8 @@
                     <div class="product-image-wrapper">
                         <div class="single-products">
                             <div class="productinfo text-center">
-                                <img src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}" />
+                                <img style=" width: 100%;height: 250px; object-fit: cover;"
+                                    src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}" />
                                 <h2>{{ number_format($product->product_price, 0, ',', '.') }} VNĐ</h2>
                                 <p>{{ $product->product_name }}</p>
                                 <a href="{{ URL('/chi-tiet-san-pham/'.$product->product_id) }}"

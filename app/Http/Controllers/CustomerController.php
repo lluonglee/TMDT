@@ -23,8 +23,33 @@ class CustomerController extends Controller
     }
 
     // Xử lý đăng ký khách hàng
+    // public function register(Request $request)
+    // {
+    //     $data = [
+    //         'customer_name' => $request->input('customer_name'),
+    //         'customer_email' => $request->input('customer_email'),
+    //         'customer_password' => Hash::make($request->input('customer_password')), // Mã hóa an toàn
+    //         'customer_phone' => $request->input('customer_phone'),
+    //     ];
+
+    //     $customer_id = DB::table('tbl_customer')->insertGetId($data);
+
+    //     Session::put('customer_id', $customer_id);
+    //     Session::put('customer_name', $request->input('customer_name'));
+
+    //     return Redirect::to('/checkout');
+    // }
     public function register(Request $request)
     {
+        // Kiểm tra dữ liệu đầu vào với validation
+        $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|unique:tbl_customer,customer_email',
+            'customer_password' => 'required|string|min:3|confirmed',  // Ràng buộc mật khẩu ít nhất 3 ký tự và phải khớp với xác nhận
+            'customer_phone' => 'required|string|max:15', // Giới hạn số điện thoại tối đa 15 ký tự
+        ]);
+
+        // Nếu validation thành công, tiếp tục xử lý dữ liệu
         $data = [
             'customer_name' => $request->input('customer_name'),
             'customer_email' => $request->input('customer_email'),
@@ -32,13 +57,17 @@ class CustomerController extends Controller
             'customer_phone' => $request->input('customer_phone'),
         ];
 
+        // Chèn thông tin khách hàng vào cơ sở dữ liệu
         $customer_id = DB::table('tbl_customer')->insertGetId($data);
 
+        // Lưu thông tin khách hàng vào session
         Session::put('customer_id', $customer_id);
         Session::put('customer_name', $request->input('customer_name'));
 
+        // Chuyển hướng tới trang checkout
         return Redirect::to('/checkout');
     }
+
 
     // Xử lý đăng nhập khách hàng
     // public function login(Request $request)

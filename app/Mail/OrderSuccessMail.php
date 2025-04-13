@@ -22,7 +22,7 @@ class OrderSuccessMail extends Mailable
 
     public function build()
     {
-        return $this->from('no-reply@shoplocalbrand.test')
+        return $this->from('lluonglee14082002@gmail.com')
             ->to($this->customerEmail)  // Now it uses the customer email
             ->subject('Đơn hàng của bạn đã được xác nhận')
             ->view('emails.order_success');

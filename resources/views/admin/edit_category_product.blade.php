@@ -1,11 +1,10 @@
 @extends('admin_layout')
-
 @section('admin_content')
 <div class="row">
     <div class="col-lg-12">
         <section class="panel">
             <header class="panel-heading">
-                Cập nhật thông tin nhân viên
+                Cập nhật danh mục sản phẩm
             </header>
             <div class="panel-body">
                 @if(Session::has('message'))
@@ -15,50 +14,30 @@
                 @endif
 
                 <div class="position-center">
-                    <form role="form" action="{{ url('/employees-update/'.$employee->employee_id) }}" method="POST">
+                    <form role="form" action="{{ url('/update-category-product/'.$category->category_id) }}"
+                        method="post">
                         {{ csrf_field() }}
-                        @method('POST')
-                        <!-- Bạn có thể dùng phương thức POST hoặc PUT ở đây -->
-
                         <div class="form-group">
-                            <label for="employee_name">Tên nhân viên</label>
-                            <input type="text" class="form-control" name="employee_name" id="employee_name"
-                                value="{{ $employee->employee_name }}" required>
+                            <label for="exampleInputEmail1">Tên danh mục</label>
+                            <input type="text" class="form-control" name="category_product_name" id="exampleInputEmail1"
+                                value="{{ $category->category_name }}" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="employee_email">Email</label>
-                            <input type="email" class="form-control" name="employee_email" id="employee_email"
-                                value="{{ $employee->employee_email }}" required>
+                            <label for="exampleInputPassword1">Mô tả danh mục</label>
+                            <textarea style="resize: none;" rows="5" class="form-control" name="category_product_desc"
+                                required id="exampleInputPassword1">{{ $category->category_desc }}</textarea>
                         </div>
+                        <button type="submit" class="btn btn-info">Cập nhật danh mục</button>
 
-                        <div class="form-group">
-                            <label for="employee_phone">Số điện thoại</label>
-                            <input type="text" class="form-control" name="employee_phone" id="employee_phone"
-                                value="{{ $employee->employee_phone }}" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="role">Vai trò</label>
-                            <select class="form-control" name="role" id="role">
-                                <option value="0" {{ $employee->role == 0 ? 'selected' : '' }}>Nhân viên</option>
-                                <option value="1" {{ $employee->role == 1 ? 'selected' : '' }}>Quản trị viên</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <address></address>
-                            <label for="employee_password">Mật khẩu</label>
-                            <input type="password" class="form-control" name="employee_password" id="employee_password">
-                            <small>(Để trống nếu không muốn thay đổi mật khẩu)</small>
-                        </div>
-
-                        <button type="submit" class="btn btn-info">Cập nhật nhân viên</button>
                     </form>
                 </div>
 
+
+
             </div>
-        </section>
+
     </div>
+    </section>
+
 </div>
 @endsection

@@ -160,6 +160,18 @@ class OrderController extends Controller
             ]);
         }
         //phần thêm vào
+        // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+        // if ($customer_email) {
+        //     $orderInfo = [  // Pass any order-related info to the email
+        //         'order_id' => $order_id,
+        //         'order_total' => $order_total,
+        //     ];
+
+        //     Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+        // }
+        //     $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+
+        // Gửi email thông báo đơn hàng thành công
         $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
         if ($customer_email) {
             $orderInfo = [  // Pass any order-related info to the email

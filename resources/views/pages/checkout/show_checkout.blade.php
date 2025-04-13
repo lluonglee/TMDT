@@ -42,27 +42,15 @@
                         <p>Shipping Order</p>
                         <textarea name="message" placeholder="Notes about your order, Special Notes for Delivery"
                             rows="16"></textarea>
-                        <label><input type="checkbox"> Shipping to bill address</label>
+
                     </div>
                 </div>
             </div>
         </div>
-        <div class="review-payment">
-            <h2>Xem lại giỏ hàng</h2>
-        </div>
 
 
-        <div class="payment-options">
-            <span>
-                <label><input type="checkbox"> Direct Bank Transfer</label>
-            </span>
-            <span>
-                <label><input type="checkbox"> Check Payment</label>
-            </span>
-            <span>
-                <label><input type="checkbox"> Paypal</label>
-            </span>
-        </div>
+
+
     </div>
 </section>
 <!--/#cart_items-->

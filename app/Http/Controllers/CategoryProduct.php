@@ -60,18 +60,44 @@ class CategoryProduct extends Controller
         return view('admin.all_category_product', compact('all_category_product'));
     }
 
+    // public function save_Category_Product(Request $request)
+    // {
+    //     $this->AuthLogin();
+    //     $data = [];
+    //     $data['category_name'] = $request->input('category-product-name'); // Sửa lỗi dấu -
+    //     $data['category_desc'] = $request->input('category_product_desc');
+    //     $data['category_status'] = $request->input('category-product-status');
+
+    //     DB::table('tbl_category_product')->insert($data);
+    //     Session::put('message', 'Them danh muc san pham thanh cong');
+    //     return Redirect::to('add-brand-Product');
+    // }
     public function save_Category_Product(Request $request)
     {
-        $this->AuthLogin();
-        $data = [];
-        $data['category_name'] = $request->input('category-product-name'); // Sửa lỗi dấu -
-        $data['category_desc'] = $request->input('category_product_desc');
-        $data['category_status'] = $request->input('category-product-status');
+        $category_name = $request->input('category-product-name');
+
+        // Kiểm tra xem tên danh mục đã tồn tại chưa (không phân biệt hoa thường)
+        $exists = DB::table('tbl_category_product')
+            ->whereRaw('LOWER(category_name) = ?', [strtolower($category_name)])
+            ->exists();
+
+        if ($exists) {
+            Session::put('message', 'Tên danh mục đã tồn tại, vui lòng chọn tên khác!');
+            return Redirect::to('/add-Category-Product');
+        }
+
+        // Nếu chưa tồn tại thì lưu
+        $data = [
+            'category_name' => $category_name,
+            'category_desc' => $request->input('category_product_desc'),
+            'category_status' => $request->input('category-product-status'),
+        ];
 
         DB::table('tbl_category_product')->insert($data);
-        Session::put('message', 'Them danh muc san pham thanh cong');
-        return Redirect::to('add-brand-Product');
+        Session::put('message', 'Thêm danh mục sản phẩm thành công!');
+        return Redirect::to('/all-Category-Product');
     }
+
     public function active_Category_Product($id)
     {
         $this->AuthLogin();
