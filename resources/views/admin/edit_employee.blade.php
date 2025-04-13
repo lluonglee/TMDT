@@ -26,6 +26,35 @@
             <option value="1" {{ $employee->role == 1 ? 'selected' : '' }}>Quản trị viên</option>
         </select>
     </div>
+    <div class="form-group">
+        <label>Phân quyền</label><br>
+        @php $permissions = json_decode($employee->permissions, true) ?? []; @endphp
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="category_product" class="form-check-input"
+                {{ in_array('category_product', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý danh mục sản phẩm</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="brand_product" class="form-check-input"
+                {{ in_array('brand_product', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý thương hiệu sản phẩm</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_product" class="form-check-input"
+                {{ in_array('manage_product', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý sản phẩm</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_order" class="form-check-input"
+                {{ in_array('manage_order', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý đơn hàng</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_customer" class="form-check-input"
+                {{ in_array('manage_customer', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý khách hàng</label>
+        </div>
+    </div>
     <button type="submit" class="btn btn-primary">Cập nhật</button>
 </form>
 

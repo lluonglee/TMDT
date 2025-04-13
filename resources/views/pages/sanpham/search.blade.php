@@ -16,8 +16,10 @@
             <div class="single-products">
                 <div class="productinfo text-center">
                     <a href="{{ url('/chi-tiet-san-pham/'.$product->product_id) }}">
-                        <img src="{{$product->product_image }}" alt="">
-                        <h2>{{ number_format($product->product_price, 0, ',', '.') }} VNĐ</h2>
+                        <img style=" width: 100%;height: 250px; object-fit: cover;" src="{{$product->product_image }}"
+                            alt="">
+                        <h2 style="color: green;">Giá: {{ number_format($product->product_price, 0, ',', '.') }} VNĐ
+                        </h2>
                         <p>{{ $product->product_name }}</p>
                     </a>
                     <a href="{{ url('/chi-tiet-san-pham/'.$product->product_id) }}"

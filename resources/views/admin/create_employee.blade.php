@@ -33,6 +33,29 @@
             <option value="1">Quản trị viên</option>
         </select>
     </div>
+    <div class="form-group">
+        <label>Phân quyền</label><br>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="category_product" class="form-check-input">
+            <label class="form-check-label">Quản lý danh mục sản phẩm</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="brand_product" class="form-check-input">
+            <label class="form-check-label">Quản lý thương hiệu sản phẩm</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_product" class="form-check-input">
+            <label class="form-check-label">Quản lý sản phẩm</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_order" class="form-check-input">
+            <label class="form-check-label">Quản lý đơn hàng</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_customer" class="form-check-input">
+            <label class="form-check-label">Quản lý khách hàng</label>
+        </div>
+    </div>
     <button type="submit" class="btn btn-primary">Tạo nhân viên</button>
 </form>
 

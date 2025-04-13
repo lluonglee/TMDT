@@ -29,6 +29,7 @@ class EmployeeController extends Controller
             'employee_email' => 'required|email|unique:tbl_employee',
             'employee_password' => 'required|string|min:8',
             'employee_phone' => 'required|string',
+            'permissions' => 'nullable|array',
         ]);
 
         // Tạo nhân viên mới
@@ -39,6 +40,7 @@ class EmployeeController extends Controller
             'employee_phone' => $request->employee_phone,
             'status' => 1, // Mặc định là hoạt động
             'role' => $request->role ?? 0, // Mặc định là nhân viên
+            'permissions' => json_encode($request->permissions ?? []),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -59,6 +61,7 @@ class EmployeeController extends Controller
             'employee_name' => 'required|string|max:255',
             'employee_email' => 'required|email',
             'employee_phone' => 'required|string',
+            'permissions' => 'nullable|array',
         ]);
 
         // Cập nhật thông tin nhân viên
@@ -67,6 +70,7 @@ class EmployeeController extends Controller
             'employee_email' => $request->employee_email,
             'employee_phone' => $request->employee_phone,
             'role' => $request->role,
+            'permissions' => json_encode($request->permissions ?? []),
             'updated_at' => now(),
         ]);
 

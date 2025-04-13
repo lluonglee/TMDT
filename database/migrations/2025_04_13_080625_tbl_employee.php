@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('employee_phone');
             $table->tinyInteger('role')->default(0); // 0: nhân viên, 1: quản trị viên
             $table->tinyInteger('status')->default(1); // 1: hoạt động, 0: bị khóa
+            $table->json('permissions')->nullable();
             $table->timestamps(); // Tự động thêm created_at và updated_at
         });
     }

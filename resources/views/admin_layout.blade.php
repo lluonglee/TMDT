@@ -249,6 +249,48 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 
                         {{-- Dành riêng cho nhân viên --}}
                         @if(Session::has('employee_id'))
+                        @php $permissions = Session::get('permissions', []); @endphp
+
+                        @if(in_array('category_product', $permissions))
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-book"></i>
+                                <span>Danh mục sản phẩm</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('/add-Category-Product') }}">Thêm danh mục sản phẩm</a></li>
+                                <li><a href="{{ url('/all-Category-Product') }}">Liệt kê danh mục sản phẩm</a></li>
+                            </ul>
+                        </li>
+                        @endif
+
+                        @if(in_array('brand_product', $permissions))
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-book"></i>
+                                <span>Thương Hiệu sản phẩm</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('/add-brand-Product') }}">Thêm thương hiệu sản phẩm</a></li>
+                                <li><a href="{{ url('/all-brand-Product') }}">Liệt kê thương hiệu sản phẩm</a></li>
+                            </ul>
+                        </li>
+                        @endif
+
+                        @if(in_array('manage_product', $permissions))
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-book"></i>
+                                <span>Quản lý sản phẩm</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('/add-Product') }}">Thêm sản phẩm</a></li>
+                                <li><a href="{{ url('/all-Product') }}">Liệt kê sản phẩm</a></li>
+                            </ul>
+                        </li>
+                        @endif
+
+                        @if(in_array('manage_order', $permissions))
                         <li class="sub-menu">
                             <a href="javascript:;">
                                 <i class="fa fa-book"></i>
@@ -258,7 +300,9 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                                 <li><a href="{{ url('/manage-order') }}">Danh sách đơn hàng</a></li>
                             </ul>
                         </li>
+                        @endif
 
+                        @if(in_array('manage_customer', $permissions))
                         <li class="sub-menu">
                             <a href="javascript:;">
                                 <i class="fa fa-user"></i>
@@ -269,8 +313,8 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             </ul>
                         </li>
                         @endif
+                        @endif
                     </ul>
-
                 </div>
                 <!-- sidebar menu end-->
             </div>

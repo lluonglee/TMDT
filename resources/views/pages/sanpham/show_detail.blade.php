@@ -30,7 +30,7 @@
                         </span>
                     </span>
                     @else
-                    <span style="font-size: 24px; font-weight: bold;">
+                    <span style="font-size: 24px; font-weight: bold; color: green;">
                         {{ number_format($detail_product->product_price, 0, ',', '.') }} VNĐ
                     </span>
                     @endif
@@ -132,7 +132,8 @@
                             <div class="productinfo text-center">
                                 <img style=" width: 100%;height: 250px; object-fit: cover;"
                                     src="{{ asset($product->product_image) }}" alt="{{ $product->product_name }}" />
-                                <h2>{{ number_format($product->product_price, 0, ',', '.') }} VNĐ</h2>
+                                <h2 style="color: green;">Giá: {{ number_format($product->product_price, 0, ',', '.') }}
+                                    VNĐ</h2>
                                 <p>{{ $product->product_name }}</p>
                                 <a href="{{ URL('/chi-tiet-san-pham/'.$product->product_id) }}"
                                     class="btn btn-default add-to-cart">

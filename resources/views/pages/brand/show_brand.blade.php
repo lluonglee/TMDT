@@ -25,7 +25,8 @@
                             </span>
                         </h2>
                         @else
-                        <h2>{{ number_format($product->product_price, 0, ',', '.') }} VNĐ</h2>
+                        <h2 style="color: green;">Giá: {{ number_format($product->product_price, 0, ',', '.') }} VNĐ
+                        </h2>
                         @endif
 
                         <p>{{ $product->product_name }}</p>

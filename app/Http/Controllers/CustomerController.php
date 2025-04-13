@@ -119,6 +119,7 @@ class CustomerController extends Controller
                 Session::put('employee_id', $employee->employee_id);
                 Session::put('employee_name', $employee->employee_name);
                 Session::put('role', $employee->role);
+                Session::put('permissions', json_decode($employee->permissions, true) ?? []); // Lưu phân quyền
                 return Redirect::to('/dashboard');
             }
         }
