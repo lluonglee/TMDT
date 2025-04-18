@@ -13,7 +13,7 @@
 
 
         <div class="register-req">
-            <p>Đăng ký để thanh toán đơn hàng</p>
+            <p>Điền thông tin giao hàng</p>
         </div>
         <!--/register-req-->
 
@@ -39,9 +39,8 @@
 
                 <div class="col-sm-4">
                     <div class="order-message">
-                        <p>Shipping Order</p>
-                        <textarea name="message" placeholder="Notes about your order, Special Notes for Delivery"
-                            rows="16"></textarea>
+                        <p>Địa chỉ chi tiết</p>
+                        <textarea name="message" placeholder="điền thông tin tại đây" rows="16"></textarea>
 
                     </div>
                 </div>

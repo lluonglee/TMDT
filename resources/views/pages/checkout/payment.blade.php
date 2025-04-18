@@ -59,7 +59,8 @@
                                 <input type="hidden" name="product_id" value="{{ $item['product_id'] }}" />
                                 <input class="cart_quantity_input" type="number" name="quantity"
                                     value="{{ $item['quantity'] }}" min="1">
-                                <button type="submit" class="btn btn-sm btn-primary">Cập nhật</button>
+                                <button style=" margin-top: 0;" type="submit" class="btn btn-sm btn-primary">Cập
+                                    nhật</button>
                             </form>
                         </td>
                         <td class="cart_total">

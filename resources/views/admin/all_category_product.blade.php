@@ -7,7 +7,7 @@
         <div class="panel-heading">
             liệt kê danh mục sản phẩm
         </div>
-        <div class="row w3-res-tb">
+        <!-- <div class="row w3-res-tb">
             <div class="col-sm-5 m-b-xs">
                 <select class="input-sm form-control w-sm inline v-middle">
                     <option value="0">Bulk action</option>
@@ -27,16 +27,16 @@
                     </span>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class="table-responsive">
             <table class="table table-striped b-t b-light">
                 <thead>
                     <tr>
-                        <th style="width:20px;">
+                        <!-- <th style="width:20px;">
                             <label class="i-checks m-b-none">
                                 <input type="checkbox"><i></i>
                             </label>
-                        </th>
+                        </th> -->
                         <th>Tên danh mục</th>
                         <th>Hiển thị</th>
                         <th>Ngày thêm</th>
@@ -46,11 +46,11 @@
                 <tbody>
                     @foreach($all_category_product as $category)
                     <tr>
-                        <td>
+                        <!-- <td>
                             <label class="i-checks m-b-none">
                                 <input type="checkbox" name="post[]"><i></i>
                             </label>
-                        </td>
+                        </td> -->
                         <td>{{ $category->category_name }}</td>
                         <td>
                             <span class="text-ellipsis">
@@ -91,7 +91,7 @@
             </table>
         </div>
         <footer class="panel-footer">
-            <div class="row">
+            <!-- <div class="row">
 
                 <div class="col-sm-5 text-center">
                     <small class="text-muted inline m-t-sm m-b-sm">showing 20-30 of 50 items</small>
@@ -106,7 +106,7 @@
                         <li><a href=""><i class="fa fa-chevron-right"></i></a></li>
                     </ul>
                 </div>
-            </div>
+            </div> -->
         </footer>
     </div>
 </div>

@@ -36,13 +36,16 @@
                         <div class="form-group">
                             <label>Thương Hiệu</label>
                             <select name="brand_id" class="form-control">
-
                                 @foreach($brands as $brand)
                                 <option value="{{ $brand->brand_id }}">{{ $brand->brand_name }}</option>
                                 @endforeach
                             </select>
                         </div>
-
+                        <div class="form-group">
+                            <label>Giá Nhập</label>
+                            <input type="number" class="form-control" name="product_import_price"
+                                placeholder="Nhập giá nhập">
+                        </div>
                         <div class="form-group">
                             <label>Giá Sản Phẩm</label>
                             <input required type="number" class="form-control" name="product_price"
@@ -51,7 +54,7 @@
 
                         <div class="form-group">
                             <label>Số Lượng</label>
-                            <input required type="number" class="form-control" name="product_quantity"
+                            <input min="1" required type="number" class="form-control" name="product_quantity"
                                 placeholder="Nhập số lượng">
                         </div>
 
@@ -83,7 +86,8 @@
 
                         <div class="form-group">
                             <label>Giảm Giá (%)</label>
-                            <input type="number" class="form-control" name="discount" placeholder="Nhập giảm giá">
+                            <input min="0" max="100" type="number" class="form-control" name="discount"
+                                placeholder="Nhập giảm giá">
                         </div>
 
                         <div class="form-group">

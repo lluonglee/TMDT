@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('product_name');
             $table->unsignedBigInteger('category_id'); // ✅ UNSIGNED BIGINT
             $table->unsignedBigInteger('brand_id');    // ✅ UNSIGNED BIGINT
+            $table->decimal('product_import_price', 10, 2);
             $table->decimal('product_price', 10, 2);
             $table->integer('product_quantity');
             $table->text('product_desc')->nullable();

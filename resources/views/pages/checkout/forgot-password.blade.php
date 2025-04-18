@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Quên Mật Khẩu</title>
     <style>
-        /* Thiết lập nền cho body */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -18,7 +17,6 @@
             height: 100vh;
         }
 
-        /* Căn giữa form */
         .container {
             background-color: white;
             padding: 40px;
@@ -28,14 +26,12 @@
             text-align: center;
         }
 
-        /* Tiêu đề */
         h2 {
             color: #333;
             font-size: 24px;
             margin-bottom: 20px;
         }
 
-        /* Các trường input */
         input.form-control {
             width: 100%;
             padding: 12px;
@@ -45,7 +41,6 @@
             box-sizing: border-box;
         }
 
-        /* Nút submit */
         button.btn-primary {
             width: 100%;
             padding: 12px;
@@ -61,7 +56,15 @@
             background-color: #0056b3;
         }
 
-        /* Alert Error */
+        .alert.alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
         .alert.alert-danger {
             background-color: #f8d7da;
             color: #721c24;
@@ -71,7 +74,6 @@
             font-size: 14px;
         }
 
-        /* Liên kết đăng ký */
         p a {
             color: #007bff;
             text-decoration: none;
@@ -84,36 +86,29 @@
         label {
             display: block;
             text-align: left;
-
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h2>Đăng Nhập</h2>
+        <h2>Quên Mật Khẩu</h2>
+        @if(Session::has('success'))
+        <p class="alert alert-success">{{ Session::get('success') }}</p>
+        @endif
         @if(Session::has('error'))
         <p class="alert alert-danger">{{ Session::get('error') }}</p>
         @endif
-        <form action="{{ url('/customer-login') }}" method="POST">
+        <form action="{{ url('/forgot-password') }}" method="POST">
             @csrf
             <div class="form-group">
                 <label>Email:</label>
-                <input type="email" name="email_account" class="form-control" required>
+                <input type="email" name="email" class="form-control" required>
             </div>
-            <div class="form-group">
-                <label>Mật khẩu:</label>
-                <input type="password" name="password_account" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <p><a href="{{ url('/forgot-password') }}">Quên mật khẩu?</a></p>
-            </div>
-            <button type="submit" class="btn btn-primary">Đăng Nhập</button>
-            <p>Chưa có tài khoản? <a href="{{ url('/customer/register') }}">Đăng ký ngay</a></p>
+            <button type="submit" class="btn btn-primary">Gửi Liên Kết Đặt Lại</button>
+            <p>Quay lại <a href="{{ url('/customer/login') }}">Đăng nhập</a></p>
         </form>
     </div>
-
-
 </body>
 
 </html>

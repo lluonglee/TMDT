@@ -120,3 +120,9 @@ Route::post('/update-order-status/{orderId}', [OrderController::class, 'updateOr
 Route::get('/print-invoice/{orderId}', [OrderController::class, 'print_invoice']);
 //đánh giá sản phẩm
 Route::post('/review/store/{product_id}', [ProductController::class, 'store'])->name('review.store');
+
+//password reset
+Route::get('/forgot-password', [CustomerController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [CustomerController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password', [CustomerController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/reset-password', [CustomerController::class, 'resetPassword'])->name('password.update');

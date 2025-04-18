@@ -59,6 +59,7 @@ class ProductController extends Controller
             'product_name' => $request->product_name,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
+            'product_import_price' => $request->product_import_price,
             'product_price' => $request->product_price,
             'product_quantity' => $request->product_quantity,
             'product_desc' => $request->product_desc,
@@ -69,6 +70,9 @@ class ProductController extends Controller
             'discount' => $request->discount,
             'product_image' => '',
         ];
+        if ($request->filled('product_import_price') && $request->product_price <= $request->product_import_price) {
+            return Redirect::back()->withInput()->with('message', 'Giá bán phải lớn hơn giá nhập.');
+        }
 
         if ($request->hasFile('product_image')) {
             $image = $request->file('product_image');
@@ -97,6 +101,7 @@ class ProductController extends Controller
             'product_name' => $request->product_name,
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
+            'product_import_price' => $request->product_import_price,
             'product_price' => $request->product_price,
             'product_quantity' => $request->product_quantity,
             'product_desc' => $request->product_desc,
@@ -106,6 +111,9 @@ class ProductController extends Controller
             'product_material' => $request->product_material,
             'discount' => $request->discount,
         ];
+        if ($request->filled('product_import_price') && $request->product_price <= $request->product_import_price) {
+            return Redirect::back()->withInput()->with('message', 'Giá bán phải lớn hơn giá nhập.');
+        }
 
         if ($request->hasFile('product_image')) {
             $image = $request->file('product_image');

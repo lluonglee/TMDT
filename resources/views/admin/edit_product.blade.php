@@ -21,16 +21,21 @@
                             <input required class="form-control" name="product_name"
                                 value="{{ $product->product_name }}">
                         </div>
+                        <div class="form-group">
+                            <label>Giá Nhập</label>
+                            <input type="number" class="form-control" name="product_import_price"
+                                value="{{ $product->product_import_price }}">
+                        </div>
 
                         <div class="form-group">
                             <label>Giá sản phẩm</label>
-                            <input required type="number" class="form-control" name="product_price"
+                            <input min="0" required type="number" class="form-control" name="product_price"
                                 value="{{ $product->product_price }}">
                         </div>
 
                         <div class="form-group">
                             <label>Số lượng</label>
-                            <input required type="number" class="form-control" name="product_quantity"
+                            <input min="0" required type="number" class="form-control" name="product_quantity"
                                 value="{{ $product->product_quantity }}">
                         </div>
 
@@ -91,7 +96,8 @@
 
                         <div class="form-group">
                             <label>Giảm giá (%)</label>
-                            <input type="number" class="form-control" name="discount" value="{{ $product->discount }}">
+                            <input min="0" max="100" type="number" class="form-control" name="discount"
+                                value="{{ $product->discount }}">
                         </div>
 
                         <div class="form-group">

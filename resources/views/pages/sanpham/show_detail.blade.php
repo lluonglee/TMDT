@@ -36,10 +36,10 @@
                     @endif
 
                     <label>Số lượng:</label>
-                    <input type="number" name="qty" value="1" min="1" />
+                    <input type="number" name="qty" value="1" min="1" max="10" />
                     <input type="hidden" name="product_id_hidden" value="{{ $detail_product->product_id }}" />
                     <button type="submit" class="btn btn-default cart">
-                        <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                        <i class="fa fa-shopping-cart"></i> Mua ngay
                     </button>
                 </span>
             </form>

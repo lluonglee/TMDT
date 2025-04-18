@@ -71,6 +71,12 @@
         p a:hover {
             text-decoration: underline;
         }
+
+        label {
+            display: block;
+            text-align: left;
+
+        }
     </style>
 </head>
 

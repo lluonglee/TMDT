@@ -26,62 +26,62 @@
 
     <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
     <style>
-    /* Phần input tìm kiếm */
-    /* Phần input tìm kiếm */
-    .col-sm-3 form input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #fff;
-        /* Màu đỏ */
-        border-radius: 5px;
-        font-size: 16px;
-        color: #333;
-        background-color: #fff;
-        /* Nền trắng */
-        outline: none;
-        transition: border-color 0.3s ease-in-out;
-    }
+        /* Phần input tìm kiếm */
+        /* Phần input tìm kiếm */
+        .col-sm-3 form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #fff;
+            /* Màu đỏ */
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            background-color: #fff;
+            /* Nền trắng */
+            outline: none;
+            transition: border-color 0.3s ease-in-out;
+        }
 
-    .col-sm-3 form input[type="text"]:focus {
-        border-color: #c9302c;
-        /* Đổi màu viền khi focus (đỏ đậm hơn) */
-    }
+        .col-sm-3 form input[type="text"]:focus {
+            border-color: #c9302c;
+            /* Đổi màu viền khi focus (đỏ đậm hơn) */
+        }
 
-    /* Phần nút tìm kiếm */
-    .col-sm-3 form button {
-        padding: 10px 15px;
-        margin-left: 10px;
-        background-color: #d9534f;
-        /* Màu đỏ */
-        border: none;
-        border-radius: 5px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        display: flex;
-        /* Căn chỉnh icon và văn bản nằm ngang */
-        align-items: center;
-        /* Căn giữa icon và văn bản theo chiều dọc */
-    }
+        /* Phần nút tìm kiếm */
+        .col-sm-3 form button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #d9534f;
+            /* Màu đỏ */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            /* Căn chỉnh icon và văn bản nằm ngang */
+            align-items: center;
+            /* Căn giữa icon và văn bản theo chiều dọc */
+        }
 
-    .col-sm-3 form button:hover {
-        background-color: #c9302c;
-        /* Đổi màu khi hover (đỏ đậm hơn) */
-    }
+        .col-sm-3 form button:hover {
+            background-color: #c9302c;
+            /* Đổi màu khi hover (đỏ đậm hơn) */
+        }
 
-    .form-flex {
-        display: flex;
-    }
+        .form-flex {
+            display: flex;
+        }
 
 
 
-    /* Icon tìm kiếm */
-    .col-sm-3 form button i {
-        font-size: 18px;
-        margin-right: 5px;
-        /* Tạo khoảng cách giữa icon và văn bản */
-    }
+        /* Icon tìm kiếm */
+        .col-sm-3 form button i {
+            font-size: 18px;
+            margin-right: 5px;
+            /* Tạo khoảng cách giữa icon và văn bản */
+        }
     </style>
 </head>
 <!--/head-->
@@ -404,60 +404,58 @@
                 <div class="row">
                     <div class="col-sm-2">
                         <div class="single-widget">
-                            <h2>Service</h2>
+                            <h2>Dịch vụ</h2>
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#">Online Help</a></li>
-                                <li><a href="#">Contact Us</a></li>
-                                <li><a href="#">Order Status</a></li>
-                                <li><a href="#">Change Location</a></li>
-                                <li><a href="#">FAQ’s</a></li>
+                                <li><a href="#">Hỗ trợ trực tiếp</a></li>
+                                <li><a href="#">Liên hệ với chúng tôi</a></li>
+                                <li><a href="#">Trạng thái đặt hàng</a></li>
+                                <li><a href="#">thay đổi thông tin</a></li>
+
                             </ul>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="single-widget">
-                            <h2>Quock Shop</h2>
+                            <h2>Cửa hàng</h2>
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#">T-Shirt</a></li>
-                                <li><a href="#">Mens</a></li>
-                                <li><a href="#">Womens</a></li>
-                                <li><a href="#">Gift Cards</a></li>
-                                <li><a href="#">Shoes</a></li>
+                                <li><a href="#">Áo</a></li>
+                                <li><a href="#">Đàn ông </a></li>
+                                <li><a href="#">Phụ nữ</a></li>
+                                <li><a href="#">thẻ quà tặng</a></li>
+
                             </ul>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="single-widget">
-                            <h2>Policies</h2>
+                            <h2>yêu cầu</h2>
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#">Terms of Use</a></li>
-                                <li><a href="#">Privecy Policy</a></li>
-                                <li><a href="#">Refund Policy</a></li>
-                                <li><a href="#">Billing System</a></li>
-                                <li><a href="#">Ticket System</a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#">hệ thống đăng nhập</a></li>
+
                             </ul>
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="single-widget">
-                            <h2>About Shopper</h2>
+                            <h2>Về cửa hàng</h2>
                             <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#">Company Information</a></li>
-                                <li><a href="#">Careers</a></li>
-                                <li><a href="#">Store Location</a></li>
-                                <li><a href="#">Affillate Program</a></li>
-                                <li><a href="#">Copyright</a></li>
+                                <li><a href="#">thông tin công ty</a></li>
+                                <li><a href="#">Công việc</a></li>
+                                <li><a href="#">Vị trí cửa hàng</a></li>
+
+
                             </ul>
                         </div>
                     </div>
                     <div class="col-sm-3 col-sm-offset-1">
                         <div class="single-widget">
-                            <h2>About Shopper</h2>
+                            <h2>Thông tin về cửa hàng</h2>
                             <form action="#" class="searchform">
-                                <input type="text" placeholder="Your email address" />
+                                <input type="text" placeholder="Địa chỉ email của bạn" />
                                 <button type="submit" class="btn btn-default"><i
                                         class="fa fa-arrow-circle-o-right"></i></button>
-                                <p>Get the most recent updates from <br />our site and be updated your self...</p>
+                                <p>Nhận những cập nhật mới nhất từ<br />trang web của chúng tôi và tự cập nhật...</p>
                             </form>
                         </div>
                     </div>

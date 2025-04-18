@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PasswordReset;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Str;
+
 
 class CustomerController extends Controller
 {
@@ -143,7 +148,113 @@ class CustomerController extends Controller
 
         return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu!');
     }
+    // Hiển thị form quên mật khẩu
+    public function showForgotPasswordForm()
+    {
+        return view('pages.checkout.forgot-password');
+    }
+    public function sendResetLinkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
 
+        // Kiểm tra email tồn tại trong bảng customer, employee hoặc admin
+        $customer = DB::table('tbl_customer')->where('customer_email', $request->email)->first();
+        $employee = DB::table('tbl_employee')->where('employee_email', $request->email)->first();
+        $admin = DB::table('tbl_admin')->where('admin_email', $request->email)->first();
+
+        if (!$customer && !$employee && !$admin) {
+            return Redirect::back()->with('error', 'Email không tồn tại.');
+        }
+
+        // Tạo token và lưu vào bảng password_resets
+        $token = Str::random(60);
+        DB::table('password_resets')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'email' => $request->email,
+                'token' => $token,
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        // Tạo URL đặt lại mật khẩu
+        $resetUrl = url('/reset-password?token=' . $token . '&email=' . urlencode($request->email));
+
+        // Gửi email
+        try {
+            Mail::to($request->email)->send(new PasswordReset($resetUrl));
+        } catch (\Exception $e) {
+            return Redirect::back()->with('error', 'Không thể gửi email. Vui lòng thử lại sau.');
+        }
+
+        return Redirect::back()->with('success', 'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn.');
+    }
+    // Hiển thị form đặt lại mật khẩu
+    public function showResetPasswordForm(Request $request)
+    {
+        $token = $request->query('token');
+        $email = $request->query('email');
+
+        // Kiểm tra token và email
+        $reset = DB::table('password_resets')
+            ->where('email', $email)
+            ->where('token', $token)
+            ->first();
+
+        if (!$reset || Carbon::parse($reset->created_at)->addMinutes(60)->isPast()) {
+            return Redirect::to('/customer/login')->with('error', 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.');
+        }
+
+        return view('pages.checkout.reset-password', compact('token', 'email'));
+    }
+
+    // Xử lý đặt lại mật khẩu
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
+            'token' => 'required',
+        ]);
+
+        // Kiểm tra token và email
+        $reset = DB::table('password_resets')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+
+        if (!$reset || Carbon::parse($reset->created_at)->addMinutes(60)->isPast()) {
+            return Redirect::to('/customer/login')->with('error', 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.');
+        }
+
+        // Kiểm tra email thuộc bảng nào và cập nhật mật khẩu
+        $customer = DB::table('tbl_customer')->where('customer_email', $request->email)->first();
+        $employee = DB::table('tbl_employee')->where('employee_email', $request->email)->first();
+        $admin = DB::table('tbl_admin')->where('admin_email', $request->email)->first();
+
+        if ($customer) {
+            DB::table('tbl_customer')
+                ->where('customer_email', $request->email)
+                ->update(['customer_password' => Hash::make($request->password)]);
+        } elseif ($employee) {
+            DB::table('tbl_employee')
+                ->where('employee_email', $request->email)
+                ->update(['employee_password' => Hash::make($request->password)]);
+        } elseif ($admin) {
+            DB::table('tbl_admin')
+                ->where('admin_email', $request->email)
+                ->update(['admin_password' => md5($request->password)]); // Lưu ý: Nên dùng Hash::make
+        } else {
+            return Redirect::to('/customer/login')->with('error', 'Email không tồn tại.');
+        }
+
+        // Xóa token sau khi đặt lại mật khẩu
+        DB::table('password_resets')->where('email', $request->email)->delete();
+
+        return Redirect::to('/customer/login')->with('success', 'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập.');
+    }
 
 
 
