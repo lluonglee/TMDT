@@ -15,8 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('product_id');
+            $table->string('customer_name')->nullable();
             $table->integer('rating');
             $table->text('comment')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->foreign('customer_id')->references('customer_id')->on('tbl_customer')->onDelete('cascade');
+            $table->foreign('product_id')->references('product_id')->on('tbl_product')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +30,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_product_reviews');
+        Schema::table('tbl_product_reviews', function (Blueprint $table) {
+            $table->dropForeign(['customer_id']);
+            $table->dropForeign(['product_id']);
+        });
     }
 };

@@ -68,35 +68,138 @@
         </div>
 
 
+        <!-- <div class="tab-pane fade in" id="reviews">
+            @if(Session::has('customer_id'))
+            @php
+            $customer_id = Session::get('customer_id');
+            $hasPurchased = DB::table('tbl_order')
+            ->join('tbl_order_detail', 'tbl_order.order_id', '=', 'tbl_order_detail.order_id')
+            ->where('tbl_order.customer_id', $customer_id)
+            ->where('tbl_order_detail.product_id', $detail_product->product_id)
+            ->whereIn('tbl_order.order_status', ['Đã giao hàng', 'Hoàn thành'])
+            ->exists();
+            $hasReviewed = DB::table('tbl_product_reviews')
+            ->where('customer_id', $customer_id)
+            ->where('product_id', $detail_product->product_id)
+            ->exists();
+            @endphp
 
-
-        <div class="tab-pane fade in" id="reviews">
+            @if($hasPurchased && !$hasReviewed)
             <form action="{{ route('review.store', ['product_id' => $detail_product->product_id]) }}" method="POST">
                 @csrf
                 <div class="form-group">
                     <label for="rating">Số sao:</label><br>
                     @for ($i = 1; $i <= 5; $i++) <label>
-                        <input type="radio" name="rating" value="{{ $i }}"> {{ $i }} ⭐
+                        <input type="radio" name="rating" value="{{ $i }}" required> {{ $i }} ⭐
                         </label>
                         @endfor
+                        @error('rating')
+                        <span style="color: red;">{{ $message }}</span>
+                        @enderror
                 </div>
 
                 <div class="form-group">
                     <label for="comment">Nhận xét:</label>
                     <textarea name="comment" id="comment" class="form-control" rows="4"
                         placeholder="Viết nhận xét của bạn..."></textarea>
+                    @error('comment')
+                    <span style="color: red;">{{ $message }}</span>
+                    @enderror
                 </div>
 
                 <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
             </form>
+            @elseif($hasReviewed)
+            <p>Bạn đã đánh giá sản phẩm này.</p>
+            @else
+            <p>Bạn cần mua và nhận sản phẩm này để có thể đánh giá.</p>
+            @endif
+            @else
+            <p>Vui lòng <a href="{{ url('/customer/login') }}">đăng nhập</a> để đánh giá sản phẩm.</p>
+            @endif
+
             <hr>
 
-            <!-- Danh sách các đánh giá -->
+
             <h4>Đánh giá sản phẩm:</h4>
             @if ($tbl_product_reviews->isEmpty())
             <p>Chưa có đánh giá nào cho sản phẩm này.</p>
             @else
             @foreach ($tbl_product_reviews as $review)
+            <div class="review mt-3 mb-3 p-2 border rounded">
+                <strong>{{ $review->customer_name }}</strong> -
+                <span>
+                    @for ($i = 1; $i <= 5; $i++) @if ($i <=$review->rating)
+                        ⭐
+                        @else
+                        ☆
+                        @endif
+                        @endfor
+                </span>
+                <p>{{ $review->comment }}</p>
+                <small class="text-muted">{{ \Carbon\Carbon::parse($review->created_at)->format('d/m/Y H:i') }}</small>
+            </div>
+            @endforeach
+            @endif
+        </div> -->
+        <div class="tab-pane fade in" id="reviews">
+            @if(Session::has('customer_id'))
+            @php
+            $customer_id = Session::get('customer_id');
+            $hasPurchased = DB::table('tbl_order')
+            ->join('tbl_order_detail', 'tbl_order.order_id', '=', 'tbl_order_detail.order_id')
+            ->where('tbl_order.customer_id', $customer_id)
+            ->where('tbl_order_detail.product_id', $detail_product->product_id)
+            ->whereIn('tbl_order.order_status', ['Đã giao hàng', 'Hoàn thành'])
+            ->exists();
+            $hasReviewed = DB::table('tbl_product_reviews')
+            ->where('customer_id', $customer_id)
+            ->where('product_id', $detail_product->product_id)
+            ->exists();
+            @endphp
+
+            @if($hasPurchased && !$hasReviewed)
+            <form action="{{ route('review.store', ['product_id' => $detail_product->product_id]) }}" method="POST">
+                @csrf
+                <div class="form-group">
+                    <label for="rating">Số sao:</label><br>
+                    @for ($i = 1; $i <= 5; $i++) <label>
+                        <input type="radio" name="rating" value="{{ $i }}" required> {{ $i }} ⭐
+                        </label>
+                        @endfor
+                        @error('rating')
+                        <span style="color: red;">{{ $message }}</span>
+                        @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="comment">Nhận xét:</label>
+                    <textarea name="comment" id="comment" class="form-control" rows="4"
+                        placeholder="Viết nhận xét của bạn..."></textarea>
+                    @error('comment')
+                    <span style="color: red;">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+            </form>
+            @elseif($hasReviewed)
+            <p>Bạn đã gửi đánh giá cho sản phẩm này. </p>
+            @else
+            <p>Bạn cần mua và nhận sản phẩm này để có thể đánh giá.</p>
+            @endif
+            @else
+            <p>Vui lòng <a href="{{ url('/customer/login') }}">đăng nhập</a> để đánh giá sản phẩm.</p>
+            @endif
+
+            <hr>
+
+            <!-- Danh sách các đánh giá -->
+            <h4>Đánh giá sản phẩm:</h4>
+            @if ($tbl_product_reviews->where('status', 'approved')->isEmpty())
+            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+            @else
+            @foreach ($tbl_product_reviews->where('status', 'approved') as $review)
             <div class="review mt-3 mb-3 p-2 border rounded">
                 <strong>{{ $review->customer_name }}</strong> -
                 <span>

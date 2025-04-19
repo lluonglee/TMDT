@@ -67,4 +67,10 @@
         </section>
     </div>
 </div>
+<style>
+.table th,
+.table td {
+    color: #000 !important;
+}
+</style>
 @endsection

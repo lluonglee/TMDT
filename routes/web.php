@@ -6,11 +6,14 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandProduct;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryProduct;
-
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PromotionController;
+
+
 
 
 
@@ -119,10 +122,23 @@ Route::post('/update-order-status/{orderId}', [OrderController::class, 'updateOr
 //in hoa đơn
 Route::get('/print-invoice/{orderId}', [OrderController::class, 'print_invoice']);
 //đánh giá sản phẩm
-Route::post('/review/store/{product_id}', [ProductController::class, 'store'])->name('review.store');
-
+Route::post('/review/{product_id}', [CommentController::class, 'store'])->name('review.store');
+Route::get('/reviews', [CommentController::class, 'index'])->name('admin.reviews.index');
+Route::patch('/reviews/{id}', [CommentController::class, 'updateStatus'])->name('admin.reviews.update');
+Route::delete('/reviews/{id}', [CommentController::class, 'destroy'])->name('admin.reviews.destroy');
 //password reset
 Route::get('/forgot-password', [CustomerController::class, 'showForgotPasswordForm'])->name('password.request');
 Route::post('/forgot-password', [CustomerController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('/reset-password', [CustomerController::class, 'showResetPasswordForm'])->name('password.reset');
 Route::post('/reset-password', [CustomerController::class, 'resetPassword'])->name('password.update');
+
+
+//khuyen mai
+Route::post('/apply-promotion', [PromotionController::class, 'applyPromotion'])->name('apply-promotion');
+Route::get('/clear-promotion', [PromotionController::class, 'clearPromotion'])->name('clear-promotion');
+Route::get('/promotions', [PromotionController::class, 'index'])->name('admin.promotions.index');
+Route::get('/promotions/create', [PromotionController::class, 'create'])->name('admin.promotions.create');
+Route::post('/promotions', [PromotionController::class, 'store'])->name('admin.promotions.store');
+Route::get('/promotions/{id}/edit', [PromotionController::class, 'edit'])->name('admin.promotions.edit');
+Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('admin.promotions.update');
+Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('admin.promotions.destroy');

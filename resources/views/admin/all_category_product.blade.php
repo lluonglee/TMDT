@@ -40,7 +40,7 @@
                         <th>Tên danh mục</th>
                         <th>Hiển thị</th>
                         <th>Ngày thêm</th>
-                        <th style="width:30px;"></th>
+                        <th>Hành động</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -110,4 +110,10 @@
         </footer>
     </div>
 </div>
+<style>
+.table th,
+.table td {
+    color: #000 !important;
+}
+</style>
 @endsection

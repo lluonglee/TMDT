@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="features_items">
-    <!--features_items-->
+
     <h2 class="title text-center" style="color: #d9534f;">Tất cả sản phẩm</h2>
     @foreach($all_product as $product)
     @php
@@ -11,7 +11,7 @@
 
     <a href="{{ URL('/chi-tiet-san-pham/'.$product->product_id) }}">
         <div class="col-sm-4">
-            <!-- col-6 col-md-3 mb-4 4 sp-->
+
 
             <div class="product-image-wrapper">
                 <div class="single-products">
@@ -40,12 +40,12 @@
 
                         <p>{{ $product->product_name }}</p>
 
-                        <!-- Form để thêm vào giỏ hàng -->
+
                         <form action="{{ URL('/save-cart') }}" method="POST">
                             @csrf
                             <input type="hidden" name="product_id_hidden" value="{{ $product->product_id }}">
 
-                            <!-- Ẩn input số lượng nhưng vẫn giữ giá trị mặc định là 1 -->
+
                             <input type="hidden" name="qty" value="1">
 
                             <button type="submit" class="btn btn-default add-to-cart">
@@ -67,6 +67,6 @@
     @endforeach
 
 </div>
-<!--features_items-->
+
 
 @endsection

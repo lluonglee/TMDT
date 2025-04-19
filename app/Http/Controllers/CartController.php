@@ -47,25 +47,9 @@ class CartController extends Controller
         return Redirect::to('/show-cart');
     }
 
-    // public function show_cart()
-    // {
-    //     $cart = Session::get('cart', []);
-    //     $subtotal = 0;
-    //     $tax = 0;
-    //     $shipping_fee = 0; // Đặt phí vận chuyển cố định hoặc tùy theo điều kiện
 
-    //     foreach ($cart as $item) {
-    //         $subtotal += $item['product_price'] * $item['quantity'];
-    //     }
 
-    //     $tax = $subtotal * 0.05; // Giả sử thuế là 5%
-    //     $total = $subtotal + $tax + $shipping_fee;
 
-    //     $categories = DB::table('tbl_category_product')->where('category_status', '1')->orderBy('category_id', 'desc')->get();
-    //     $brands = DB::table('tbl_brand')->where('brand_status', '1')->orderBy('brand_id', 'desc')->get();
-
-    //     return view('pages.cart.show_cart', compact('categories', 'brands', 'subtotal', 'tax', 'shipping_fee', 'total'));
-    // }
     public function show_cart()
     {
         $cart = Session::get('cart', []);

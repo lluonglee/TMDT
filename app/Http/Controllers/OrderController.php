@@ -17,7 +17,8 @@ use Dompdf\Options;
 //order
 class OrderController extends Controller
 {
-    //
+
+
     // public function order_place(Request $request)
     // {
     //     $payment_method = $request->input('payment_option');
@@ -41,18 +42,13 @@ class OrderController extends Controller
     //         return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
     //     }
 
-    //     // Tính tổng tiền đơn hàng và giảm giá
+    //     // Tính tổng tiền đơn hàng mà không tính giảm giá
     //     $order_total = 0;
-    //     $discount_total = 0; // Tổng giá trị giảm giá
+    //     $discount_total = 0; // Tổng giá trị giảm giá (sẽ bỏ qua)
 
     //     foreach ($cart as $item) {
-    //         // Tính giá sau giảm
-    //         $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
-    //         $total_price = $discount_price * $item['quantity'];
-
-    //         // Cộng tổng giá trị giảm giá
-    //         $discount_value = ($item['product_price'] - $discount_price) * $item['quantity'];
-    //         $discount_total += $discount_value;
+    //         // Sử dụng giá gốc thay vì giá sau giảm
+    //         $total_price = $item['product_price'] * $item['quantity'];
 
     //         // Cộng vào tổng tiền đơn hàng
     //         $order_total += $total_price;
@@ -86,6 +82,16 @@ class OrderController extends Controller
     //         ]);
     //     }
 
+    //     // Gửi email thông báo đơn hàng thành công
+    //     $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+    //     if ($customer_email) {
+    //         $orderInfo = [  // Pass any order-related info to the email
+    //             'order_id' => $order_id,
+    //             'order_total' => $order_total,
+    //         ];
+
+    //         Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+    //     }
     //     // Xóa giỏ hàng trong session sau khi đặt hàng
     //     Session::forget('cart');
 
@@ -96,45 +102,49 @@ class OrderController extends Controller
     //         return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
     //     }
     // }
-
     public function order_place(Request $request)
     {
-        $payment_method = $request->input('payment_option');
+        $request->validate([
+            'payment_option' => 'required|in:bằng thẻ,tiền mặt',
+        ]);
 
-        // Kiểm tra người dùng có đăng nhập không
         $customer_id = Session::get('customer_id');
         if (!$customer_id) {
-            return redirect()->back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
+            return Redirect::back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
         }
 
-        // Kiểm tra địa chỉ giao hàng có tồn tại không
         $shipping_id = Session::get('shipping_id');
         if (!$shipping_id) {
-            return redirect()->back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
+            return Redirect::back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
         }
 
-        // Lấy giỏ hàng từ Session
         $cart = Session::get('cart', []);
-
         if (empty($cart)) {
-            return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
+            return Redirect::back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
         }
 
-        // Tính tổng tiền đơn hàng mà không tính giảm giá
-        $order_total = 0;
-        $discount_total = 0; // Tổng giá trị giảm giá (sẽ bỏ qua)
+        // Tính tổng tiền, giảm giá sản phẩm, và giảm giá mã
+        $subtotal = 0;
+        $product_discount_total = $request->product_discount_total ?? 0;
+        $promotion_discount = $request->promotion_discount ?? 0;
+        $promotion_code = $request->promotion_code ?? '';
 
         foreach ($cart as $item) {
-            // Sử dụng giá gốc thay vì giá sau giảm
-            $total_price = $item['product_price'] * $item['quantity'];
-
-            // Cộng vào tổng tiền đơn hàng
-            $order_total += $total_price;
+            $discounted_price = $item['product_price'] * (1 - ($item['product_discount'] ?? 0) / 100);
+            $subtotal += $item['product_price'] * $item['quantity'];
+            $product_discount_total += ($item['product_price'] - $discounted_price) * $item['quantity'];
         }
+
+        // Giới hạn promotion_discount tối đa bằng tổng tiền sau giảm giá sản phẩm
+        $total_after_product_discount = $subtotal - $product_discount_total;
+        $promotion_discount = min($promotion_discount, $total_after_product_discount);
+
+        // Tính tổng tiền đơn hàng, đảm bảo không âm
+        $order_total = max(0, $total_after_product_discount - $promotion_discount);
 
         // Thêm thông tin thanh toán
         $payment_id = DB::table('tbl_payment')->insertGetId([
-            'payment_method' => $payment_method,
+            'payment_method' => $request->payment_option,
             'payment_status' => 'Đang chờ xử lý',
             'created_at' => Carbon::now(),
         ]);
@@ -145,33 +155,37 @@ class OrderController extends Controller
             'shipping_id' => $shipping_id,
             'payment_id' => $payment_id,
             'order_total' => $order_total,
+            'discount_code' => $promotion_code,
+            'discount_amount' => $promotion_discount,
             'order_status' => 'Đang xử lý',
             'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ]);
 
-        // Thêm dữ liệu vào bảng tbl_order_detail từ giỏ hàng session
+        // Thêm chi tiết đơn hàng
         foreach ($cart as $item) {
+            $discounted_price = $item['product_price'] * (1 - ($item['product_discount'] ?? 0) / 100);
+            $original_price = $item['product_price'];
             DB::table('tbl_order_detail')->insert([
                 'order_id' => $order_id,
                 'product_id' => $item['product_id'],
                 'product_quantity' => $item['quantity'],
-                'product_price' => $item['product_price'],
+                'product_price' => $discounted_price, // Giá sau giảm sản phẩm
+                'original_price' => $original_price, // Giá gốc
                 'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
         }
-        //phần thêm vào
-        // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
-        // if ($customer_email) {
-        //     $orderInfo = [  // Pass any order-related info to the email
-        //         'order_id' => $order_id,
-        //         'order_total' => $order_total,
-        //     ];
 
-        //     Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
-        // }
-        //     $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+        // Cập nhật số lần sử dụng mã khuyến mãi
+        if ($promotion_code && $promotion_discount > 0) {
+            DB::table('tbl_promotion')
+                ->where('code', $promotion_code)
+                ->increment('used_count');
+        }
 
-        // Gửi email thông báo đơn hàng thành công
+
+        //     // Gửi email thông báo đơn hàng thành công
         $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
         if ($customer_email) {
             $orderInfo = [  // Pass any order-related info to the email
@@ -181,87 +195,22 @@ class OrderController extends Controller
 
             Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
         }
-        // Xóa giỏ hàng trong session sau khi đặt hàng
-        Session::forget('cart');
 
-        // Điều hướng sau khi đặt hàng
-        if ($payment_method == 'bằng thẻ') {
-            return redirect('/payment-card');
+        // Xóa giỏ hàng và mã khuyến mãi
+        Session::forget('cart');
+        Session::forget('promotion_discount');
+        Session::forget('promotion_code');
+
+        // Điều hướng
+        if ($request->payment_option == 'bằng thẻ') {
+            return Redirect::to('/payment-card');
         } else {
-            return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
+            return Redirect::to('/thank-you')->with('success', 'Đặt hàng thành công!');
         }
     }
 
 
-    //order mail
 
-    // public function order_place(Request $request)
-    // {
-    //     $payment_method = $request->input('payment_option');
-
-    //     // Kiểm tra người dùng có đăng nhập không
-    //     $customer_id = Session::get('customer_id');
-    //     if (!$customer_id) {
-    //         return redirect()->back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
-    //     }
-
-    //     // Kiểm tra địa chỉ giao hàng có tồn tại không
-    //     $shipping_id = Session::get('shipping_id');
-    //     if (!$shipping_id) {
-    //         return redirect()->back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
-    //     }
-
-    //     // Lấy giỏ hàng từ Session
-    //     $cart = Session::get('cart', []);
-
-    //     if (empty($cart)) {
-    //         return redirect()->back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
-    //     }
-
-    //     // Tính tổng tiền đơn hàng mà không tính giảm giá
-    //     $order_total = 0;
-
-    //     foreach ($cart as $item) {
-    //         $total_price = $item['product_price'] * $item['quantity'];
-    //         $order_total += $total_price;
-    //     }
-
-    //     // Thêm thông tin thanh toán
-    //     $payment_id = DB::table('tbl_payment')->insertGetId([
-    //         'payment_method' => $payment_method,
-    //         'payment_status' => 'Đang chờ xử lý',
-    //         'created_at' => Carbon::now(),
-    //     ]);
-
-    //     // Thêm đơn hàng vào bảng tbl_order
-    //     $order_id = DB::table('tbl_order')->insertGetId([
-    //         'customer_id' => $customer_id,
-    //         'shipping_id' => $shipping_id,
-    //         'payment_id' => $payment_id,
-    //         'order_total' => $order_total,
-    //         'order_status' => 'Đang xử lý',
-    //         'created_at' => Carbon::now(),
-    //     ]);
-
-    //     // Lấy email khách hàng
-    //     $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
-
-    //     // Gửi email thông báo đơn hàng thành công
-    //     if ($customer_email) {
-    //         $orderInfo = [  // Pass any order-related info to the email
-    //             'order_id' => $order_id,
-    //             'order_total' => $order_total,
-    //         ];
-
-    //         Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
-    //     }
-
-    //     // Xóa giỏ hàng trong session sau khi đặt hàng
-    //     Session::forget('cart');
-
-    //     // Điều hướng sau khi đặt hàng
-    //     return redirect('/thank-you')->with('success', 'Đặt hàng thành công!');
-    // }
 
 
 
@@ -312,6 +261,7 @@ class OrderController extends Controller
 
         ]);;
     }
+
     // public function orderDetail($order_id)
     // {
     //     $categories = DB::table('tbl_category_product')
@@ -323,16 +273,19 @@ class OrderController extends Controller
     //         ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
     //         ->orderBy('brand_id', 'desc')
     //         ->get();
-
+    //     // Kiểm tra xem người dùng đã đăng nhập chưa
     //     $customer_id = Session::get('customer_id');
+    //     if (!$customer_id) {
+    //         return redirect('/login')->with('error', 'Vui lòng đăng nhập để xem chi tiết đơn hàng');
+    //     }
 
-    //     // Lấy thông tin đơn hàng
+    //     // Lấy thông tin đơn hàng cho khách hàng
     //     $order = DB::table('tbl_order')
     //         ->where('order_id', $order_id)
     //         ->where('customer_id', $customer_id)
     //         ->first();
 
-    //     // Nếu không tìm thấy đơn hàng, redirect đến lịch sử đơn hàng
+    //     // Nếu không tìm thấy đơn hàng
     //     if (!$order) {
     //         return redirect('/order-history')->with('error', 'Đơn hàng không tồn tại.');
     //     }
@@ -344,13 +297,6 @@ class OrderController extends Controller
     //         ->select('tbl_order_detail.*', 'tbl_product.product_name', 'tbl_product.product_image')
     //         ->get();
 
-    //     // Kiểm tra trạng thái đơn hàng, cập nhật nếu cần
-    //     if ($order->order_status != $order->status) {
-    //         DB::table('tbl_order')
-    //             ->where('order_id', $order_id)
-    //             ->update(['order_status' => $order->status]); // Cập nhật trạng thái
-    //     }
-
     //     // Trả về view chi tiết đơn hàng
     //     return view('pages.order.detail', compact('order', 'order_details'))->with([
     //         'categories' => $categories, // Truyền đúng biến
@@ -360,43 +306,64 @@ class OrderController extends Controller
     public function orderDetail($order_id)
     {
         $categories = DB::table('tbl_category_product')
-            ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+            ->where('category_status', '1')
             ->orderBy('category_id', 'desc')
             ->get();
 
         $brands = DB::table('tbl_brand')
-            ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+            ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
-        // Kiểm tra xem người dùng đã đăng nhập chưa
+
         $customer_id = Session::get('customer_id');
         if (!$customer_id) {
-            return redirect('/login')->with('error', 'Vui lòng đăng nhập để xem chi tiết đơn hàng');
+            return Redirect::to('/login')->with('error', 'Vui lòng đăng nhập để xem chi tiết đơn hàng');
         }
 
-        // Lấy thông tin đơn hàng cho khách hàng
         $order = DB::table('tbl_order')
             ->where('order_id', $order_id)
             ->where('customer_id', $customer_id)
+            ->select('order_id', 'order_total', 'order_status', 'discount_code', 'discount_amount', 'created_at', 'shipping_id', 'payment_id')
             ->first();
 
-        // Nếu không tìm thấy đơn hàng
         if (!$order) {
-            return redirect('/order-history')->with('error', 'Đơn hàng không tồn tại.');
+            return Redirect::to('/order-history')->with('error', 'Đơn hàng không tồn tại.');
         }
 
-        // Lấy chi tiết sản phẩm trong đơn hàng
         $order_details = DB::table('tbl_order_detail')
             ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
-            ->where('order_id', $order_id)
-            ->select('tbl_order_detail.*', 'tbl_product.product_name', 'tbl_product.product_image')
+            ->where('tbl_order_detail.order_id', $order_id)
+            ->select(
+                'tbl_order_detail.*',
+                'tbl_product.product_name',
+                'tbl_product.product_image',
+                'tbl_product.discount as product_discount'
+            )
             ->get();
 
-        // Trả về view chi tiết đơn hàng
-        return view('pages.order.detail', compact('order', 'order_details'))->with([
-            'categories' => $categories, // Truyền đúng biến
-            'brands' => $brands,
-        ]);
+        $shipping = DB::table('tbl_shipping')
+            ->where('shipping_id', $order->shipping_id)
+            ->select('shipping_name', 'shipping_address', 'shipping_phone', 'shipping_email')
+            ->first();
+
+        $payment = DB::table('tbl_payment')
+            ->where('payment_id', $order->payment_id)
+            ->select('payment_method', 'payment_status')
+            ->first();
+
+        $subtotal = 0;
+        $product_discount_total = 0;
+        foreach ($order_details as $item) {
+            $original_price = $item->original_price ?? $item->product_price / (1 - ($item->product_discount / 100));
+            $subtotal += $original_price * $item->product_quantity;
+            $product_discount_total += ($original_price - $item->product_price) * $item->product_quantity;
+        }
+
+        // Giới hạn promotion_discount tối đa bằng tổng tiền sau giảm giá sản phẩm
+        $total_after_product_discount = $subtotal - $product_discount_total;
+        $order->discount_amount = min($order->discount_amount ?? 0, $total_after_product_discount);
+
+        return view('pages.order.detail', compact('order', 'order_details', 'categories', 'brands', 'shipping', 'payment', 'subtotal', 'product_discount_total'));
     }
 
 
@@ -417,6 +384,62 @@ class OrderController extends Controller
     }
 
 
+    // public function view_order($orderId)
+    // {
+    //     $order_details = DB::table('tbl_order')
+    //         ->join('tbl_customer', 'tbl_order.customer_id', '=', 'tbl_customer.customer_id')
+    //         ->join('tbl_shipping', 'tbl_order.shipping_id', '=', 'tbl_shipping.shipping_id')
+    //         ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id')
+    //         ->join('tbl_order_detail', 'tbl_order.order_id', '=', 'tbl_order_detail.order_id')
+    //         ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
+    //         ->where('tbl_order.order_id', $orderId)
+    //         ->select(
+    //             'tbl_order.order_id',
+    //             'tbl_order.order_total',
+    //             'tbl_order.order_status',
+    //             'tbl_order.discount_code',
+    //             'tbl_order.discount_amount',
+    //             'tbl_order.created_at',
+    //             'tbl_customer.customer_name',
+    //             'tbl_customer.customer_email',
+    //             'tbl_customer.customer_phone',
+    //             'tbl_shipping.shipping_name',
+    //             'tbl_shipping.shipping_address',
+    //             'tbl_shipping.shipping_phone',
+    //             'tbl_shipping.shipping_email',
+    //             'tbl_payment.payment_method',
+    //             'tbl_payment.payment_status',
+    //             'tbl_order_detail.order_detail_id',
+    //             'tbl_order_detail.product_id',
+    //             'tbl_order_detail.product_quantity',
+    //             'tbl_order_detail.product_price',
+    //             'tbl_order_detail.original_price',
+    //             'tbl_product.product_name',
+    //             'tbl_product.discount as product_discount'
+    //         )
+    //         ->get();
+
+    //     $order = $order_details->first();
+    //     if (!$order) {
+    //         return Redirect::to('/manage-order')->with('error', 'Đơn hàng không tồn tại.');
+    //     }
+
+    //     // Tính tổng tiền gốc và giảm giá sản phẩm
+    //     $subtotal = 0;
+    //     $product_discount_total = 0;
+    //     foreach ($order_details as $detail) {
+    //         $original_price = $detail->original_price ?? ($detail->product_price / (1 - ($detail->product_discount / 100)));
+    //         $subtotal += $original_price * $detail->product_quantity;
+    //         $product_discount_total += ($original_price - $detail->product_price) * $detail->product_quantity;
+    //     }
+
+    //     return view('admin.view_order')->with([
+    //         'order_details' => $order_details,
+    //         'order' => $order,
+    //         'subtotal' => $subtotal,
+    //         'product_discount_total' => $product_discount_total,
+    //     ]);
+    // }
     public function view_order($orderId)
     {
         $order_details = DB::table('tbl_order')
@@ -427,38 +450,55 @@ class OrderController extends Controller
             ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
             ->where('tbl_order.order_id', $orderId)
             ->select(
-                'tbl_order.*',
-                'tbl_customer.*',
-                'tbl_shipping.*',
-                'tbl_payment.*',
-                'tbl_order_detail.*',
-                'tbl_product.product_name'
+                'tbl_order.order_id',
+                'tbl_order.order_total',
+                'tbl_order.order_status',
+                'tbl_order.discount_code',
+                'tbl_order.discount_amount',
+                'tbl_order.created_at',
+                'tbl_customer.customer_name',
+                'tbl_customer.customer_email',
+                'tbl_customer.customer_phone',
+                'tbl_shipping.shipping_name',
+                'tbl_shipping.shipping_address',
+                'tbl_shipping.shipping_phone',
+                'tbl_shipping.shipping_email',
+                'tbl_payment.payment_method',
+                'tbl_payment.payment_status',
+                'tbl_order_detail.order_detail_id',
+                'tbl_order_detail.product_id',
+                'tbl_order_detail.product_quantity',
+                'tbl_order_detail.product_price',
+                'tbl_order_detail.original_price',
+                'tbl_product.product_name',
+                'tbl_product.discount as product_discount'
             )
             ->get();
 
-        $order = $order_details->first(); // để hiển thị chung
+        $order = $order_details->first();
+        if (!$order) {
+            return Redirect::to('/manage-order')->with('error', 'Đơn hàng không tồn tại.');
+        }
+
+        $subtotal = 0;
+        $product_discount_total = 0;
+        foreach ($order_details as $detail) {
+            $original_price = $detail->original_price ?? ($detail->product_price / (1 - ($detail->product_discount / 100)));
+            $subtotal += $original_price * $detail->product_quantity;
+            $product_discount_total += ($original_price - $detail->product_price) * $detail->product_quantity;
+        }
+
+        // Giới hạn discount_amount tối đa bằng tổng tiền sau giảm giá sản phẩm
+        $total_after_product_discount = $subtotal - $product_discount_total;
+        $order->discount_amount = min($order->discount_amount ?? 0, $total_after_product_discount);
+
         return view('admin.view_order')->with([
             'order_details' => $order_details,
-            'order' => $order
+            'order' => $order,
+            'subtotal' => $subtotal,
+            'product_discount_total' => $product_discount_total,
         ]);
     }
-    // public function updateOrderStatus(Request $request, $orderId)
-    // {
-    //     // Validate trạng thái đơn hàng
-    //     $request->validate([
-    //         'order_status' => 'required|in:Đang xử lý,Hoàn thành,Đã hủy',
-    //     ]);
-
-    //     // Cập nhật trạng thái đơn hàng
-    //     DB::table('tbl_order')
-    //         ->where('order_id', $orderId)
-    //         ->update([
-    //             'order_status' => $request->order_status,
-    //         ]);
-
-    //     // Thông báo cập nhật thành công
-    //     return redirect()->back()->with('message', 'Cập nhật trạng thái đơn hàng thành công');
-    // }
     public function updateOrderStatus(Request $request, $orderId)
     {
         // Validate trạng thái đơn hàng

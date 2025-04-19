@@ -26,62 +26,62 @@
 
     <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
     <style>
-        /* Phần input tìm kiếm */
-        /* Phần input tìm kiếm */
-        .col-sm-3 form input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #fff;
-            /* Màu đỏ */
-            border-radius: 5px;
-            font-size: 16px;
-            color: #333;
-            background-color: #fff;
-            /* Nền trắng */
-            outline: none;
-            transition: border-color 0.3s ease-in-out;
-        }
+    /* Phần input tìm kiếm */
+    /* Phần input tìm kiếm */
+    .col-sm-3 form input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #fff;
+        /* Màu đỏ */
+        border-radius: 5px;
+        font-size: 16px;
+        color: #333;
+        background-color: #fff;
+        /* Nền trắng */
+        outline: none;
+        transition: border-color 0.3s ease-in-out;
+    }
 
-        .col-sm-3 form input[type="text"]:focus {
-            border-color: #c9302c;
-            /* Đổi màu viền khi focus (đỏ đậm hơn) */
-        }
+    .col-sm-3 form input[type="text"]:focus {
+        border-color: #c9302c;
+        /* Đổi màu viền khi focus (đỏ đậm hơn) */
+    }
 
-        /* Phần nút tìm kiếm */
-        .col-sm-3 form button {
-            padding: 10px 15px;
-            margin-left: 10px;
-            background-color: #d9534f;
-            /* Màu đỏ */
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: flex;
-            /* Căn chỉnh icon và văn bản nằm ngang */
-            align-items: center;
-            /* Căn giữa icon và văn bản theo chiều dọc */
-        }
+    /* Phần nút tìm kiếm */
+    .col-sm-3 form button {
+        padding: 10px 15px;
+        margin-left: 10px;
+        background-color: #d9534f;
+        /* Màu đỏ */
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: flex;
+        /* Căn chỉnh icon và văn bản nằm ngang */
+        align-items: center;
+        /* Căn giữa icon và văn bản theo chiều dọc */
+    }
 
-        .col-sm-3 form button:hover {
-            background-color: #c9302c;
-            /* Đổi màu khi hover (đỏ đậm hơn) */
-        }
+    .col-sm-3 form button:hover {
+        background-color: #c9302c;
+        /* Đổi màu khi hover (đỏ đậm hơn) */
+    }
 
-        .form-flex {
-            display: flex;
-        }
+    .form-flex {
+        display: flex;
+    }
 
 
 
-        /* Icon tìm kiếm */
-        .col-sm-3 form button i {
-            font-size: 18px;
-            margin-right: 5px;
-            /* Tạo khoảng cách giữa icon và văn bản */
-        }
+    /* Icon tìm kiếm */
+    .col-sm-3 form button i {
+        font-size: 18px;
+        margin-right: 5px;
+        /* Tạo khoảng cách giữa icon và văn bản */
+    }
     </style>
 </head>
 <!--/head-->
@@ -475,14 +475,15 @@
     </footer>
     <!--/Footer-->
 
-
-
     <script src="{{asset('public/frontend/js/jquery.js')}}"></script>
     <script src="{{asset('public/frontend/js/bootstrap.min.js')}} "></script>
     <script src="{{asset('public/frontend/js/jquery.scrollUp.min.js')}} "></script>
     <script src="{{asset('public/frontend/js/price-range.js')}}"></script>
     <script src="{{asset('public/frontend/js/jquery.prettyPhoto.js')}} "></script>
     <script src="{{asset('public/frontend/js/main.js')}} "></script>
+
+
+
 </body>
 
 </html>

@@ -18,10 +18,10 @@ return new class extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('shipping_id');
             $table->unsignedBigInteger('payment_id');
-
             $table->decimal('order_total', 15, 2);
+            $table->string('discount_code', 50)->nullable();
+            $table->decimal('discount_amount', 10, 2)->default(0);
             $table->enum('order_status', ['Đang xử lý', 'Hoàn thành', 'Đã hủy'])->default('Đang xử lý');
-
             $table->timestamps();
         });
     }
