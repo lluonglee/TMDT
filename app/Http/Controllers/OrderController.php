@@ -522,36 +522,72 @@ class OrderController extends Controller
 
     public function print_invoice($orderId)
     {
-        // Lấy dữ liệu đơn hàng và chi tiết sản phẩm
+        // Lấy dữ liệu đơn hàng
         $order = DB::table('tbl_order')
             ->join('tbl_customer', 'tbl_order.customer_id', '=', 'tbl_customer.customer_id')
             ->join('tbl_shipping', 'tbl_order.shipping_id', '=', 'tbl_shipping.shipping_id')
             ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id')
             ->select(
-                'tbl_order.*',
+                'tbl_order.order_id',
+                'tbl_order.order_total',
+                'tbl_order.order_status',
+                'tbl_order.discount_code',
+                'tbl_order.discount_amount',
+                'tbl_order.created_at',
                 'tbl_customer.customer_name',
                 'tbl_customer.customer_email',
                 'tbl_customer.customer_phone',
                 'tbl_shipping.shipping_name',
                 'tbl_shipping.shipping_address',
                 'tbl_shipping.shipping_phone',
+                'tbl_shipping.shipping_email',
                 'tbl_payment.payment_method',
                 'tbl_payment.payment_status'
             )
             ->where('tbl_order.order_id', $orderId)
             ->first();
 
+        if (!$order) {
+            return Redirect::to('/manage-order')->with('error', 'Đơn hàng không tồn tại.');
+        }
+
+        // Lấy chi tiết đơn hàng
         $order_details = DB::table('tbl_order_detail')
             ->join('tbl_product', 'tbl_order_detail.product_id', '=', 'tbl_product.product_id')
             ->where('tbl_order_detail.order_id', $orderId)
-            ->select('tbl_order_detail.*', 'tbl_product.product_name')
+            ->select(
+                'tbl_order_detail.order_detail_id',
+                'tbl_order_detail.product_id',
+                'tbl_order_detail.product_quantity',
+                'tbl_order_detail.product_price',
+                'tbl_order_detail.original_price',
+                'tbl_product.product_name',
+                'tbl_product.discount as product_discount'
+            )
             ->get();
 
-        // Khởi tạo Dompdf
-        $dompdf = new Dompdf();
+        // Tính tổng tiền gốc và giảm giá sản phẩm
+        $subtotal = 0;
+        $product_discount_total = 0;
+        foreach ($order_details as $detail) {
+            $original_price = $detail->original_price ?? ($detail->product_price / (1 - ($detail->product_discount / 100)));
+            $subtotal += $original_price * $detail->product_quantity;
+            $product_discount_total += ($original_price - $detail->product_price) * $detail->product_quantity;
+        }
+
+        // Giới hạn discount_amount tối đa bằng tổng tiền sau giảm giá sản phẩm
+        $total_after_product_discount = $subtotal - $product_discount_total;
+        $promotion_discount = min($order->discount_amount ?? 0, $total_after_product_discount);
+
+        // Khởi tạo Dompdf với tùy chọn hỗ trợ UTF-8
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $options->set('defaultFont', 'DejaVu Sans');
+        $dompdf = new Dompdf($options);
 
         // Tạo nội dung HTML cho hóa đơn
-        $html = view('admin.print_invoice', compact('order', 'order_details'))->render();
+        $html = view('admin.print_invoice', compact('order', 'order_details', 'subtotal', 'product_discount_total', 'promotion_discount'))->render();
 
         // Load HTML vào Dompdf
         $dompdf->loadHtml($html);
