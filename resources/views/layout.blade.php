@@ -26,62 +26,62 @@
 
     <link rel="apple-touch-icon-precomposed" href="images/ico/apple-touch-icon-57-precomposed.png">
     <style>
-    /* Phần input tìm kiếm */
-    /* Phần input tìm kiếm */
-    .col-sm-3 form input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #fff;
-        /* Màu đỏ */
-        border-radius: 5px;
-        font-size: 16px;
-        color: #333;
-        background-color: #fff;
-        /* Nền trắng */
-        outline: none;
-        transition: border-color 0.3s ease-in-out;
-    }
+        /* Phần input tìm kiếm */
+        /* Phần input tìm kiếm */
+        .col-sm-3 form input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #fff;
+            /* Màu đỏ */
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            background-color: #fff;
+            /* Nền trắng */
+            outline: none;
+            transition: border-color 0.3s ease-in-out;
+        }
 
-    .col-sm-3 form input[type="text"]:focus {
-        border-color: #c9302c;
-        /* Đổi màu viền khi focus (đỏ đậm hơn) */
-    }
+        .col-sm-3 form input[type="text"]:focus {
+            border-color: #c9302c;
+            /* Đổi màu viền khi focus (đỏ đậm hơn) */
+        }
 
-    /* Phần nút tìm kiếm */
-    .col-sm-3 form button {
-        padding: 10px 15px;
-        margin-left: 10px;
-        background-color: #d9534f;
-        /* Màu đỏ */
-        border: none;
-        border-radius: 5px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        display: flex;
-        /* Căn chỉnh icon và văn bản nằm ngang */
-        align-items: center;
-        /* Căn giữa icon và văn bản theo chiều dọc */
-    }
+        /* Phần nút tìm kiếm */
+        .col-sm-3 form button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #d9534f;
+            /* Màu đỏ */
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            /* Căn chỉnh icon và văn bản nằm ngang */
+            align-items: center;
+            /* Căn giữa icon và văn bản theo chiều dọc */
+        }
 
-    .col-sm-3 form button:hover {
-        background-color: #c9302c;
-        /* Đổi màu khi hover (đỏ đậm hơn) */
-    }
+        .col-sm-3 form button:hover {
+            background-color: #c9302c;
+            /* Đổi màu khi hover (đỏ đậm hơn) */
+        }
 
-    .form-flex {
-        display: flex;
-    }
+        .form-flex {
+            display: flex;
+        }
 
 
 
-    /* Icon tìm kiếm */
-    .col-sm-3 form button i {
-        font-size: 18px;
-        margin-right: 5px;
-        /* Tạo khoảng cách giữa icon và văn bản */
-    }
+        /* Icon tìm kiếm */
+        .col-sm-3 form button i {
+            font-size: 18px;
+            margin-right: 5px;
+            /* Tạo khoảng cách giữa icon và văn bản */
+        }
     </style>
 </head>
 <!--/head-->
@@ -155,24 +155,25 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="col-sm-8">
                         <div class="shop-menu pull-right">
 
                             <ul class="nav navbar-nav">
                                 <li><a href="#"><i class="fa fa-star"></i> Danh sách yêu thích</a></li>
 
+                                @if(Session::has('cart') && count(Session::get('cart')) > 0)
                                 @if(Session::has('customer_id'))
                                 @if(Session::has('shipping_id'))
                                 <li><a href="{{ URL('/payment') }}"><i class="fa fa-money"></i> Thanh toán</a></li>
                                 @else
-                                <li><a href="{{ URL('/checkout') }}"><i class="fa fa-lock"></i> Điền thông tin giao
-                                        hàng</a></li>
+                                <li><a href="{{ URL('/checkout') }}" class="btn btn-primary"><i class="fa fa-lock"></i>
+                                        Điền thông tin giao hàng</a></li>
                                 @endif
                                 @else
-                                <li style="display: none;">
-                                    <a href="{{ URL('/login-checkout') }}"><i class="fa fa-lock"></i> Đăng nhập để thanh
-                                        toán</a>
-                                </li>
+                                <li><a href="{{ URL('/login-checkout') }}" class="btn btn-primary"><i
+                                            class="fa fa-lock"></i> Đăng nhập để thanh toán</a></li>
+                                @endif
                                 @endif
 
                                 <li><a href="{{ URL('/show-cart') }}"><i class="fa fa-shopping-cart"></i> Giỏ hàng</a>
@@ -474,6 +475,51 @@
 
     </footer>
     <!--/Footer-->
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            console.log('jQuery loaded:', typeof $);
+            console.log('matp select exists:', $('#matp').length);
+
+            $('#matp').on('change', function() {
+                var matp = $(this).val();
+                console.log('Selected matp:', matp);
+                $('#maqh').empty().append('<option value="">Cả tỉnh</option>');
+
+                if (matp) {
+                    $.ajax({
+                        url: '{{ route("shipping_fees.get_districts", ":matp") }}'.replace(':matp',
+                            matp),
+                        type: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            console.log('AJAX request started');
+                            $('#maqh').prop('disabled', true).append(
+                                '<option>Loading...</option>');
+                        },
+                        success: function(data) {
+                            console.log('Districts:', data);
+                            $('#maqh').prop('disabled', false).empty().append(
+                                '<option value="">Cả tỉnh</option>');
+                            $.each(data, function(key, district) {
+                                $('#maqh').append('<option value="' + district.maqh +
+                                    '">' + district.name + '</option>');
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('AJAX Error:', xhr.status, error, xhr.responseText);
+                            $('#maqh').prop('disabled', false).empty().append(
+                                '<option value="">Lỗi tải dữ liệu</option>');
+                        }
+                    });
+                } else {
+                    console.log('No matp selected');
+                }
+            });
+        });
+    </script>
 
     <script src="{{asset('public/frontend/js/jquery.js')}}"></script>
     <script src="{{asset('public/frontend/js/bootstrap.min.js')}} "></script>

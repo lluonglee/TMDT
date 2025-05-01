@@ -18,7 +18,6 @@
                         <td class="image">Hình ảnh</td>
                         <td class="description">Mô tả</td>
                         <td class="price">Giá gốc</td>
-                        <td class="price">Giá sau giảm sản phẩm</td>
                         <td class="price">Giá sau mã khuyến mãi</td>
                         <td class="quantity">Số lượng</td>
                         <td class="total">Tổng tiền</td>
@@ -68,16 +67,7 @@
                         <td class="cart_price">
                             <p>{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</p>
                         </td>
-                        <td class="cart_price">
-                            @if($discount_percentage > 0)
-                            <p>
-                                <del>{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</del><br>
-                                {{ number_format($discounted_price, 0, ',', '.') }} VNĐ (-{{ $discount_percentage }}%)
-                            </p>
-                            @else
-                            <p>{{ number_format($discounted_price, 0, ',', '.') }} VNĐ</p>
-                            @endif
-                        </td>
+
                         <td class="cart_price">
                             @if($promotion_discount > 0)
                             <p>{{ number_format($final_price, 0, ',', '.') }} VNĐ</p>
@@ -96,7 +86,8 @@
                             </form>
                         </td>
                         <td class="cart_total">
-                            <p class="cart_total_price">{{ number_format($total_price, 0, ',', '.') }} VNĐ</p>
+                            <!-- <p class="cart_total_price">{{ number_format($total_price, 0, ',', '.') }} VNĐ</p> -->
+                            <p class="cart_total_price">{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</p>
                         </td>
                         <td class="cart_delete">
                             <a class="cart_quantity_delete" href="{{ URL::to('/remove-cart/'.$item['product_id']) }}">
@@ -139,9 +130,10 @@
                 <div class="form-group">
                     <input type="text" name="promotion_code" class="form-control" placeholder="Nhập mã khuyến mãi"
                         value="{{ $promotion_code }}" style="width: 200px; display: inline-block;">
-                    <button type="submit" class="btn btn-primary" style="margin-left: 10px;">Áp dụng</button>
+                    <button type="submit" class="btn btn-warning" style="margin-left: 10px;   ">Áp dụng</button>
                     @if($promotion_code)
-                    <a href="{{ URL::to('/clear-promotion') }}" class="btn btn-warning" style="margin-left: 10px;">Hủy
+                    <a href="{{ URL::to('/clear-promotion') }}" class="btn btn-warning"
+                        style="margin-left: 10px; background-color: red;">Hủy
                         mã</a>
                     @endif
                 </div>
@@ -182,6 +174,18 @@
     .btn-primary:hover {
         background-color: #0056B3;
         border-color: #0056B3;
+    }
+
+    button .btn-warning {
+        background-color: #007BFF;
+        border-color: #007BFF;
+
+    }
+
+    button .btn-warning:hover {
+        background-color: #0056B3;
+        border-color: #0056B3;
+
     }
 
     .btn-warning {

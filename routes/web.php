@@ -12,6 +12,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ShippingFeeController;
 
 
 
@@ -113,7 +114,17 @@ Route::get('/order-detail/{order_id}', [OrderController::class, 'orderDetail']);
 //shipping
 Route::post('/save-shipping', [CustomerController::class, 'saveShipping']);
 Route::get('/payment', [CustomerController::class, 'payment']);
+Route::get('shipping-fees', [ShippingFeeController::class, 'index'])->name('shipping_fees.index');
+Route::get('shipping-fees/create', [ShippingFeeController::class, 'create'])->name('shipping_fees.create');
+Route::post('shipping-fees', [ShippingFeeController::class, 'store'])->name('shipping_fees.store');
+Route::get('shipping-fees/{id}/edit', [ShippingFeeController::class, 'edit'])->name('shipping_fees.edit');
+Route::put('shipping-fees/{id}', [ShippingFeeController::class, 'update'])->name('shipping_fees.update');
+Route::delete('shipping-fees/{id}', [ShippingFeeController::class, 'destroy'])->name('shipping_fees.destroy');
 
+Route::get('shipping-fees/get-districts/{matp}', [ShippingFeeController::class, 'getDistricts'])->name('shipping_fees.get_districts');
+Route::get('shipping-fees/get-fee/{matp}/{maqh?}', [ShippingFeeController::class, 'getShippingFee'])->name('shipping_fees.get_fee');
+Route::get('/edit-shipping', [ShippingFeeController::class, 'editShipping'])->name('frontend.edit_shipping');
+Route::post('/update-shipping', [ShippingFeeController::class, 'updateShipping'])->name('frontend.update_shipping');
 //
 Route::get('/manage-order', [OrderController::class, 'manage_order']);
 Route::get('/view-order/{orderId}', [OrderController::class, 'view_order']);

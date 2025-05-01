@@ -137,7 +137,7 @@ class CustomerController extends Controller
             if (Hash::check($password, $customer->customer_password)) {
                 Session::put('customer_id', $customer->customer_id);
                 Session::put('customer_name', $customer->customer_name);
-                return Redirect::to('/checkout');
+                return Redirect::to('/');
             }
         }
         if ($admin) {
@@ -153,6 +153,7 @@ class CustomerController extends Controller
     {
         return view('pages.checkout.forgot-password');
     }
+    //gửi mail
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate([
@@ -258,22 +259,44 @@ class CustomerController extends Controller
 
 
 
+    // public function check_out()
+    // {
+    //     $categories = DB::table('tbl_category_product')
+    //         ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+    //         ->orderBy('category_id', 'desc')
+    //         ->get();
+
+    //     $brands = DB::table('tbl_brand')
+    //         ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+    //         ->orderBy('brand_id', 'desc')
+    //         ->get();
+    //     return view('pages.checkout.show_checkout')->with([
+    //         'categories' => $categories, // Truyền đúng biến
+    //         'brands' => $brands,
+
+    //     ]);;
+    // }
     public function check_out()
     {
         $categories = DB::table('tbl_category_product')
-            ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+            ->where('category_status', '1')
             ->orderBy('category_id', 'desc')
             ->get();
 
         $brands = DB::table('tbl_brand')
-            ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+            ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
-        return view('pages.checkout.show_checkout')->with([
-            'categories' => $categories, // Truyền đúng biến
-            'brands' => $brands,
 
-        ]);;
+        $provinces = DB::table('tbl_tinhthanhpho')
+            ->orderBy('name')
+            ->get();
+
+        return view('pages.checkout.show_checkout')->with([
+            'categories' => $categories,
+            'brands' => $brands,
+            'provinces' => $provinces,
+        ]);
     }
 
 
@@ -285,22 +308,61 @@ class CustomerController extends Controller
     }
 
     //shipping
+    // public function saveShipping(Request $request)
+    // {
+    //     $data = [
+    //         'shipping_email' => $request->shipping_email,
+    //         'shipping_name' => $request->shipping_name,
+    //         'shipping_address' => $request->shipping_address,
+    //         'shipping_phone' => $request->shipping_phone,
+    //     ];
+
+    //     $shipping_id = DB::table('tbl_shipping')->insertGetId($data);
+
+    //     Session::put('shipping_id', $shipping_id);
+
+    //     return Redirect::to('/payment');
+    // }
     public function saveShipping(Request $request)
     {
+        // Lấy phí ship từ shipping_fees dựa trên matp và maqh
+        $matp = $request->matp;
+        $maqh = $request->maqh ?: null;
+        $shipping_fee = 0;
+
+        if ($matp) {
+            $query = DB::table('shipping_fees')->where('matp', $matp);
+            if ($maqh) {
+                $query->where('maqh', $maqh);
+            } else {
+                $query->whereNull('maqh');
+            }
+            $fee_record = $query->select('fee')->first();
+            $shipping_fee = $fee_record ? $fee_record->fee : 0;
+        } else {
+        }
+
         $data = [
             'shipping_email' => $request->shipping_email,
             'shipping_name' => $request->shipping_name,
             'shipping_address' => $request->shipping_address,
             'shipping_phone' => $request->shipping_phone,
+            'matp' => $matp,
+            'maqh' => $maqh,
+            'shipping_fee' => $shipping_fee,
         ];
 
         $shipping_id = DB::table('tbl_shipping')->insertGetId($data);
 
+
         Session::put('shipping_id', $shipping_id);
+        Session::put('shipping_fee', $shipping_fee);
 
         return Redirect::to('/payment');
     }
-    public function payment(Request $request)
+
+
+    public function payment()
     {
         $categories = DB::table('tbl_category_product')
             ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị

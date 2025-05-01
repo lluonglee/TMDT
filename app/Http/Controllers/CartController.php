@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class CartController extends Controller
 {
@@ -13,78 +14,73 @@ class CartController extends Controller
     {
         $productId = $request->product_id_hidden;
         $quantity = $request->qty;
-
-        // Lấy sản phẩm từ cơ sở dữ liệu
         $product = DB::table('tbl_product')->where('product_id', $productId)->first();
 
         if ($product) {
-            // Lấy giỏ hàng hiện tại từ session
             $cart = Session::get('cart', []);
-
-            // Tính giá sau khi giảm (nếu có)
             $discount_price = $product->product_price * (1 - ($product->discount ?? 0) / 100);
-
-            // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng
             if (isset($cart[$productId])) {
                 $cart[$productId]['quantity'] += $quantity;
             } else {
-                // Nếu sản phẩm chưa có trong giỏ hàng, thêm mới
                 $cart[$productId] = [
                     'product_id' => $product->product_id,
                     'product_name' => $product->product_name,
-                    'product_price' => $discount_price, // Lưu giá đã giảm
+                    'product_price' => $discount_price,
                     'product_image' => $product->product_image,
                     'discount' => $product->discount ?? 0,
                     'quantity' => $quantity,
                 ];
             }
-
-            // Cập nhật giỏ hàng trong session
             Session::put('cart', $cart);
         }
-
-        // Chuyển hướng về trang giỏ hàng
         return Redirect::to('/show-cart');
     }
-
-
-
 
     public function show_cart()
     {
         $cart = Session::get('cart', []);
         $subtotal = 0;
-        $shipping_fee = 0; // Phí vận chuyển có thể thay đổi theo điều kiện
-
         foreach ($cart as $item) {
-            // Tính giá sau khi giảm
-            $discount_price = $item['product_price'] * (1 - ($item['discount'] ?? 0) / 100);
-            $total_price = $discount_price * $item['quantity'];
-
+            $total_price = $item['product_price'] * $item['quantity'];
             $subtotal += $total_price;
         }
 
-        // Không còn tính thuế
-        $total = $subtotal + $shipping_fee;
+        // Khởi tạo shipping_fee mặc định
+        $shipping_fee = 0;
+        $shipping_id = Session::get('shipping_id');
 
-        $categories = DB::table('tbl_category_product')->where('category_status', '1')->orderBy('category_id', 'desc')->get();
-        $brands = DB::table('tbl_brand')->where('brand_status', '1')->orderBy('brand_id', 'desc')->get();
+        if ($shipping_id && Schema::hasColumn('tbl_shipping', 'shipping_fee')) {
+            $shipping = DB::table('tbl_shipping')
+                ->where('shipping_id', $shipping_id)
+                ->select('shipping_id', 'matp', 'maqh', 'shipping_fee')
+                ->first();
 
-        return view('pages.cart.show_cart', compact('categories', 'brands', 'subtotal', 'shipping_fee', 'total'));
+            if ($shipping) {
+                $shipping_fee = $shipping->shipping_fee ?? 0;
+            } else {
+            }
+        } else {
+        }
+
+        $categories = DB::table('tbl_category_product')
+            ->where('category_status', '1')
+            ->orderBy('category_id', 'desc')
+            ->get();
+        $brands = DB::table('tbl_brand')
+            ->where('brand_status', '1')
+            ->orderBy('brand_id', 'desc')
+            ->get();
+
+        return view('pages.cart.show_cart', compact('categories', 'brands', 'subtotal', 'shipping_fee'));
     }
-
-
-
 
     public function remove_cart($product_id)
     {
         $cart = Session::get('cart', []);
-
         if (isset($cart[$product_id])) {
             unset($cart[$product_id]);
             Session::put('cart', $cart);
         }
-
         return Redirect::to('/show-cart');
     }
 
@@ -92,32 +88,17 @@ class CartController extends Controller
     {
         $product_id = $request->product_id;
         $quantity = $request->quantity;
-
         $cart = Session::get('cart', []);
-
         if (isset($cart[$product_id])) {
             $cart[$product_id]['quantity'] = $quantity;
             Session::put('cart', $cart);
         }
-
-        return Redirect::to('/show-cart');
-    }
-    public function delete_cart($productId)
-    {
-        $cart = Session::get('cart', []);
-
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]); // Xóa sản phẩm khỏi mảng
-        }
-
-        Session::put('cart', $cart); // Cập nhật lại session
         return Redirect::to('/show-cart');
     }
 
-    // Xóa toàn bộ giỏ hàng
     public function clear_cart()
     {
-        Session::forget('cart'); // Xóa toàn bộ session giỏ hàng
+        Session::forget('cart');
         return Redirect::to('/show-cart');
     }
 }

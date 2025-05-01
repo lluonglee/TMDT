@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
             // Thêm khóa ngoại
             $table->foreign('order_id')->references('order_id')->on('tbl_order')->onDelete('cascade');
-            $table->foreign('product_id')->references('product_id')->on('tbl_product')->onDelete('restrict');
+            $table->foreign('product_id')->references('product_id')->on('tbl_product')->onDelete('cascade');
         });
     }
 
