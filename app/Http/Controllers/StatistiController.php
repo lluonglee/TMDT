@@ -11,34 +11,68 @@ class StatistiController extends Controller
 {
     public function index(Request $request)
     {
-        // Lấy start_date và end_date, mặc định là tháng hiện tại
+        // Lấy filter_type, mặc định là 'range'
+        $filter_type = $request->query('filter_type', 'range');
         $start_date = $request->query('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
         $end_date = $request->query('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
+        $day = $request->query('day', Carbon::now()->format('Y-m-d'));
+        $week = $request->query('week', Carbon::now()->format('Y-W'));
+        $year = $request->query('year', Carbon::now()->format('Y'));
 
-        // Validate định dạng ngày
+        // Xây dựng query cơ bản
+        $query = DB::table('tbl_order');
+        $error_message = null;
+
+        // Xử lý theo filter_type
         try {
-            $start = Carbon::parse($start_date)->startOfDay();
-            $end = Carbon::parse($end_date)->endOfDay();
-
-            // Kiểm tra start_date <= end_date
-            if ($start > $end) {
-                Session::flash('message', 'Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.');
+            if ($filter_type === 'range') {
+                $start = Carbon::parse($start_date)->startOfDay();
+                $end = Carbon::parse($end_date)->endOfDay();
+                if ($start > $end) {
+                    $error_message = 'Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc.';
+                    $start = Carbon::now()->startOfMonth();
+                    $end = Carbon::now()->endOfMonth();
+                    $start_date = $start->format('Y-m-d');
+                    $end_date = $end->format('Y-m-d');
+                }
+                $query->whereBetween('tbl_order.created_at', [$start, $end]);
+            } elseif ($filter_type === 'day') {
+                $date = Carbon::parse($day)->startOfDay();
+                $query->whereDate('tbl_order.created_at', $date);
+            } elseif ($filter_type === 'week') {
+                $parts = explode('-', $week);
+                if (count($parts) !== 2 || !is_numeric($parts[0]) || !is_numeric($parts[1])) {
+                    throw new \Exception('Định dạng tuần không hợp lệ.');
+                }
+                $query->whereYear('tbl_order.created_at', $parts[0])
+                    ->whereWeek('tbl_order.created_at', $parts[1]);
+            } elseif ($filter_type === 'year') {
+                if (!is_numeric($year) || strlen($year) !== 4) {
+                    throw new \Exception('Định dạng năm không hợp lệ.');
+                }
+                $query->whereYear('tbl_order.created_at', $year);
+            } else {
+                $error_message = 'Loại bộ lọc không hợp lệ.';
+                $filter_type = 'range';
                 $start = Carbon::now()->startOfMonth();
                 $end = Carbon::now()->endOfMonth();
                 $start_date = $start->format('Y-m-d');
                 $end_date = $end->format('Y-m-d');
+                $query->whereBetween('tbl_order.created_at', [$start, $end]);
             }
         } catch (\Exception $e) {
-            Session::flash('message', 'Định dạng ngày không hợp lệ.');
+            $error_message = $e->getMessage() ?: 'Dữ liệu nhập không hợp lệ.';
+            $filter_type = 'range';
             $start = Carbon::now()->startOfMonth();
             $end = Carbon::now()->endOfMonth();
             $start_date = $start->format('Y-m-d');
             $end_date = $end->format('Y-m-d');
+            $query->whereBetween('tbl_order.created_at', [$start, $end]);
         }
 
-        // Xây dựng query cơ bản
-        $query = DB::table('tbl_order')
-            ->whereBetween('tbl_order.created_at', [$start, $end]);
+        if ($error_message) {
+            Session::flash('message', $error_message);
+        }
 
         // Tổng doanh thu, phí ship, số đơn hàng
         $total_stats = (clone $query)->selectRaw('
@@ -91,8 +125,12 @@ class StatistiController extends Controller
             'total_orders' => $total_orders,
             'status_stats' => $status_stats,
             'top_products' => $top_products,
+            'filter_type' => $filter_type,
             'start_date' => $start_date,
             'end_date' => $end_date,
+            'day' => $day,
+            'week' => $week,
+            'year' => $year,
             'chart_labels' => $chart_labels,
             'chart_data' => $chart_values,
         ]);

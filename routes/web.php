@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandProduct;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryProduct;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\EmployeeController;
@@ -14,12 +15,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ShippingFeeController;
 use App\Http\Controllers\StatistiController;
-
-
-
-
-
-
+use App\Http\Controllers\VNPayController;
 
 //frontend
 Route::get('/', [HomeController::class, 'index']);
@@ -158,3 +154,9 @@ Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name
 
 //
 Route::get('/statistics', [StatistiController::class, 'index'])->name('statistics');
+//vnpay
+Route::post('/order-place', [CheckoutController::class, 'order_place'])->name('order.place');
+Route::get('/vnpay/callback', [VNPayController::class, 'callback'])->name('vnpay.callback');
+Route::get('/checkout/result', function () {
+    return view('checkout_result');
+})->name('checkout.result');

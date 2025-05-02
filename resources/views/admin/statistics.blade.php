@@ -4,17 +4,39 @@
 <div class="container">
     <h2 class="my-3">Thống Kê Đơn Hàng</h2>
 
-    {{-- Form lọc theo khoảng thời gian --}}
+    {{-- Form lọc --}}
     <form action="{{ url('/statistics') }}" method="GET" class="row g-3 align-items-end mb-4">
         <div class="col-auto">
+            <label for="filter_type" class="form-label">Loại bộ lọc</label>
+            <select name="filter_type" id="filter_type" class="form-control" onchange="toggleInputs()">
+                <option value="range" {{ $filter_type === 'range' ? 'selected' : '' }}>Khoảng thời gian</option>
+                <option value="day" {{ $filter_type === 'day' ? 'selected' : '' }}>Ngày</option>
+                <option value="week" {{ $filter_type === 'week' ? 'selected' : '' }}>Tuần</option>
+                <option value="year" {{ $filter_type === 'year' ? 'selected' : '' }}>Năm</option>
+            </select>
+        </div>
+        <div class="col-auto" id="range_inputs" style="display: {{ $filter_type === 'range' ? 'block' : 'none' }}">
             <label for="start_date" class="form-label">Từ ngày</label>
             <input type="date" name="start_date" id="start_date" class="form-control"
-                value="{{ request('start_date') ?? \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}" required>
-        </div>
-        <div class="col-auto">
-            <label for="end_date" class="form-label">Đến ngày</label>
+                value="{{ $start_date ?? \Carbon\Carbon::now()->startOfMonth()->format('Y-m-d') }}">
+            <label for="end_date" class="form-label mt-2">Đến ngày</label>
             <input type="date" name="end_date" id="end_date" class="form-control"
-                value="{{ request('end_date') ?? \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}" required>
+                value="{{ $end_date ?? \Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}">
+        </div>
+        <div class="col-auto" id="day_input" style="display: {{ $filter_type === 'day' ? 'block' : 'none' }}">
+            <label for="day" class="form-label">Ngày</label>
+            <input type="date" name="day" id="day" class="form-control"
+                value="{{ $day ?? \Carbon\Carbon::now()->format('Y-m-d') }}">
+        </div>
+        <div class="col-auto" id="week_input" style="display: {{ $filter_type === 'week' ? 'block' : 'none' }}">
+            <label for="week" class="form-label">Tuần</label>
+            <input type="week" name="week" id="week" class="form-control"
+                value="{{ $week ?? \Carbon\Carbon::now()->format('Y-W') }}">
+        </div>
+        <div class="col-auto" id="year_input" style="display: {{ $filter_type === 'year' ? 'block' : 'none' }}">
+            <label for="year" class="form-label">Năm</label>
+            <input type="number" name="year" id="year" class="form-control" min="2000" max="2100"
+                value="{{ $year ?? \Carbon\Carbon::now()->format('Y') }}">
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary">Thống Kê</button>
@@ -128,6 +150,17 @@
 {{-- ChartJS script --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
+    function toggleInputs() {
+        const filterType = document.getElementById('filter_type').value;
+        document.getElementById('range_inputs').style.display = filterType === 'range' ? 'block' : 'none';
+        document.getElementById('day_input').style.display = filterType === 'day' ? 'block' : 'none';
+        document.getElementById('week_input').style.display = filterType === 'week' ? 'block' : 'none';
+        document.getElementById('year_input').style.display = filterType === 'year' ? 'block' : 'none';
+    }
+
+    // Khởi tạo trạng thái ban đầu
+    toggleInputs();
+
     const canvas = document.getElementById('revenueChart');
     if (canvas) {
         const chartLabels = JSON.parse(canvas.dataset.labels);

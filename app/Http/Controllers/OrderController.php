@@ -103,117 +103,117 @@ class OrderController extends Controller
     //     }
     // }
 
-    public function order_place(Request $request)
-    {
-        $request->validate([
-            'payment_option' => 'required|in:bằng thẻ,tiền mặt',
-        ]);
+    // public function order_place(Request $request)
+    // {
+    //     $request->validate([
+    //         'payment_option' => 'required|in:bằng thẻ,tiền mặt',
+    //     ]);
 
-        $customer_id = Session::get('customer_id');
-        if (!$customer_id) {
-            return Redirect::back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
-        }
+    //     $customer_id = Session::get('customer_id');
+    //     if (!$customer_id) {
+    //         return Redirect::back()->with('error', 'Bạn cần đăng nhập để đặt hàng!');
+    //     }
 
-        $shipping_id = Session::get('shipping_id');
-        if (!$shipping_id) {
-            return Redirect::back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
-        }
+    //     $shipping_id = Session::get('shipping_id');
+    //     if (!$shipping_id) {
+    //         return Redirect::back()->with('error', 'Vui lòng thêm địa chỉ giao hàng trước khi đặt hàng!');
+    //     }
 
-        $cart = Session::get('cart', []);
-        if (empty($cart)) {
-            return Redirect::back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
-        }
+    //     $cart = Session::get('cart', []);
+    //     if (empty($cart)) {
+    //         return Redirect::back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
+    //     }
 
-        // Lấy shipping_fee từ tbl_shipping
-        $shipping = DB::table('tbl_shipping')
-            ->where('shipping_id', $shipping_id)
-            ->select('shipping_fee')
-            ->first();
-        $shipping_fee = $shipping ? ($shipping->shipping_fee ?? 0) : 0;
+    //     // Lấy shipping_fee từ tbl_shipping
+    //     $shipping = DB::table('tbl_shipping')
+    //         ->where('shipping_id', $shipping_id)
+    //         ->select('shipping_fee')
+    //         ->first();
+    //     $shipping_fee = $shipping ? ($shipping->shipping_fee ?? 0) : 0;
 
-        // Tính tổng tiền, giảm giá sản phẩm, và giảm giá mã
-        $subtotal = 0;
-        $product_discount_total = $request->product_discount_total ?? 0;
-        $promotion_discount = $request->promotion_discount ?? 0;
-        $promotion_code = $request->promotion_code ?? '';
+    //     // Tính tổng tiền, giảm giá sản phẩm, và giảm giá mã
+    //     $subtotal = 0;
+    //     $product_discount_total = $request->product_discount_total ?? 0;
+    //     $promotion_discount = $request->promotion_discount ?? 0;
+    //     $promotion_code = $request->promotion_code ?? '';
 
-        foreach ($cart as $item) {
-            $discounted_price = $item['product_price'] * (1 - ($item['product_discount'] ?? 0) / 100);
-            $subtotal += $item['product_price'] * $item['quantity'];
-            $product_discount_total += ($item['product_price'] - $discounted_price) * $item['quantity'];
-        }
+    //     foreach ($cart as $item) {
+    //         $discounted_price = $item['product_price'] * (1 - ($item['product_discount'] ?? 0) / 100);
+    //         $subtotal += $item['product_price'] * $item['quantity'];
+    //         $product_discount_total += ($item['product_price'] - $discounted_price) * $item['quantity'];
+    //     }
 
-        // Giới hạn promotion_discount tối đa bằng tổng tiền sau giảm giá sản phẩm
-        $total_after_product_discount = $subtotal - $product_discount_total;
-        $promotion_discount = min($promotion_discount, $total_after_product_discount);
+    //     // Giới hạn promotion_discount tối đa bằng tổng tiền sau giảm giá sản phẩm
+    //     $total_after_product_discount = $subtotal - $product_discount_total;
+    //     $promotion_discount = min($promotion_discount, $total_after_product_discount);
 
-        // Tính tổng tiền đơn hàng, bao gồm shipping_fee
-        $order_total = max(0, $total_after_product_discount - $promotion_discount + $shipping_fee);
+    //     // Tính tổng tiền đơn hàng, bao gồm shipping_fee
+    //     $order_total = max(0, $total_after_product_discount - $promotion_discount + $shipping_fee);
 
-        // Thêm thông tin thanh toán
-        $payment_id = DB::table('tbl_payment')->insertGetId([
-            'payment_method' => $request->payment_option,
-            'payment_status' => 'Đang chờ xử lý',
-            'created_at' => Carbon::now(),
-        ]);
+    //     // Thêm thông tin thanh toán
+    //     $payment_id = DB::table('tbl_payment')->insertGetId([
+    //         'payment_method' => $request->payment_option,
+    //         'payment_status' => 'Đang chờ xử lý',
+    //         'created_at' => Carbon::now(),
+    //     ]);
 
-        // Thêm đơn hàng vào bảng tbl_order
-        $order_id = DB::table('tbl_order')->insertGetId([
-            'customer_id' => $customer_id,
-            'shipping_id' => $shipping_id,
-            'payment_id' => $payment_id,
-            'order_total' => $order_total,
-            'shipping_fee' => $shipping_fee, // Lưu shipping_fee
-            'discount_code' => $promotion_code,
-            'discount_amount' => $promotion_discount,
-            'order_status' => 'Đang xử lý',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+    //     // Thêm đơn hàng vào bảng tbl_order
+    //     $order_id = DB::table('tbl_order')->insertGetId([
+    //         'customer_id' => $customer_id,
+    //         'shipping_id' => $shipping_id,
+    //         'payment_id' => $payment_id,
+    //         'order_total' => $order_total,
+    //         'shipping_fee' => $shipping_fee, // Lưu shipping_fee
+    //         'discount_code' => $promotion_code,
+    //         'discount_amount' => $promotion_discount,
+    //         'order_status' => 'Đang xử lý',
+    //         'created_at' => Carbon::now(),
+    //         'updated_at' => Carbon::now(),
+    //     ]);
 
-        // Thêm chi tiết đơn hàng
-        foreach ($cart as $item) {
-            $discounted_price = $item['product_price'] * (1 - ($item['product_discount'] ?? 0) / 100);
-            $original_price = $item['product_price'];
-            DB::table('tbl_order_detail')->insert([
-                'order_id' => $order_id,
-                'product_id' => $item['product_id'],
-                'product_quantity' => $item['quantity'],
-                'product_price' => $discounted_price, // Giá sau giảm sản phẩm
-                'original_price' => $original_price, // Giá gốc
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-        }
+    //     // Thêm chi tiết đơn hàng
+    //     foreach ($cart as $item) {
+    //         $discounted_price = $item['product_price'] * (1 - ($item['product_discount'] ?? 0) / 100);
+    //         $original_price = $item['product_price'];
+    //         DB::table('tbl_order_detail')->insert([
+    //             'order_id' => $order_id,
+    //             'product_id' => $item['product_id'],
+    //             'product_quantity' => $item['quantity'],
+    //             'product_price' => $discounted_price, // Giá sau giảm sản phẩm
+    //             'original_price' => $original_price, // Giá gốc
+    //             'created_at' => Carbon::now(),
+    //             'updated_at' => Carbon::now(),
+    //         ]);
+    //     }
 
-        // Cập nhật số lần sử dụng mã khuyến mãi
-        if ($promotion_code && $promotion_discount > 0) {
-            DB::table('tbl_promotion')
-                ->where('code', $promotion_code)
-                ->increment('used_count');
-        }
+    //     // Cập nhật số lần sử dụng mã khuyến mãi
+    //     if ($promotion_code && $promotion_discount > 0) {
+    //         DB::table('tbl_promotion')
+    //             ->where('code', $promotion_code)
+    //             ->increment('used_count');
+    //     }
 
-        // Gửi email thông báo đơn hàng thành công (nếu bật)
-        // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
-        // if ($customer_email) {
-        //     $orderInfo = [
-        //         'order_id' => $order_id,
-        //         'order_total' => $order_total,
-        //         'shipping_fee' => $shipping_fee, // Thêm shipping_fee
-        //     ];
-        //     Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
-        // }
+    //     // Gửi email thông báo đơn hàng thành công (nếu bật)
+    //     // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+    //     // if ($customer_email) {
+    //     //     $orderInfo = [
+    //     //         'order_id' => $order_id,
+    //     //         'order_total' => $order_total,
+    //     //         'shipping_fee' => $shipping_fee, // Thêm shipping_fee
+    //     //     ];
+    //     //     Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+    //     // }
 
-        // Xóa giỏ hàng, mã khuyến mãi và shipping
-        Session::forget(['cart', 'promotion_discount', 'promotion_code', 'shipping_id', 'shipping_fee']);
+    //     // Xóa giỏ hàng, mã khuyến mãi và shipping
+    //     Session::forget(['cart', 'promotion_discount', 'promotion_code', 'shipping_id', 'shipping_fee']);
 
-        // Điều hướng
-        if ($request->payment_option == 'bằng thẻ') {
-            return Redirect::to('/payment-card');
-        } else {
-            return Redirect::to('/thank-you')->with('success', 'Đặt hàng thành công!');
-        }
-    }
+    //     // Điều hướng
+    //     if ($request->payment_option == 'bằng thẻ') {
+    //         return Redirect::to('/payment-card');
+    //     } else {
+    //         return Redirect::to('/thank-you')->with('success', 'Đặt hàng thành công!');
+    //     }
+    // }
 
     public function thank_you()
     {
