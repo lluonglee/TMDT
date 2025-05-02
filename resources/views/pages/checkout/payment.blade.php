@@ -31,6 +31,7 @@
                     $product_discount_total = 0;
                     $promotion_discount = Session::get('promotion_discount', 0);
                     $promotion_code = Session::get('promotion_code', '');
+                    $shipping_fee = Session::get('shipping_fee', 0); // Lấy phí ship từ session
                     // Tính tổng tiền sau giảm giá sản phẩm
                     foreach (Session::get('cart') as $item) {
                     $discount_percentage = $item['product_discount'] ?? 0;
@@ -67,7 +68,6 @@
                         <td class="cart_price">
                             <p>{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</p>
                         </td>
-
                         <td class="cart_price">
                             @if($promotion_discount > 0)
                             <p>{{ number_format($final_price, 0, ',', '.') }} VNĐ</p>
@@ -86,8 +86,7 @@
                             </form>
                         </td>
                         <td class="cart_total">
-                            <!-- <p class="cart_total_price">{{ number_format($total_price, 0, ',', '.') }} VNĐ</p> -->
-                            <p class="cart_total_price">{{ number_format($item['product_price'], 0, ',', '.') }} VNĐ</p>
+                            <p class="cart_total_price">{{ number_format($total_price, 0, ',', '.') }} VNĐ</p>
                         </td>
                         <td class="cart_delete">
                             <a class="cart_quantity_delete" href="{{ URL::to('/remove-cart/'.$item['product_id']) }}">
@@ -97,7 +96,7 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="8" class="text-right">
+                        <td colspan="7" class="text-right">
                             <h4><b>Tổng tiền gốc: {{ number_format($subtotal, 0, ',', '.') }} VNĐ</b></h4>
                             @if($product_discount_total > 0)
                             <h4 style="color: #28A745;"><b>Giảm giá sản phẩm:
@@ -107,15 +106,16 @@
                             <h4 style="color: #28A745;"><b>Giảm giá mã ({{ $promotion_code }}):
                                     -{{ number_format($promotion_discount, 0, ',', '.') }} VNĐ</b></h4>
                             @endif
+                            <h4><b>Phí ship: {{ number_format($shipping_fee, 0, ',', '.') }} VNĐ</b></h4>
                             <h4><b>Thành tiền:
-                                    {{ number_format(max(0, $subtotal - $product_discount_total - $promotion_discount), 0, ',', '.') }}
+                                    {{ number_format(max(0, $subtotal - $product_discount_total - $promotion_discount + $shipping_fee), 0, ',', '.') }}
                                     VNĐ</b></h4>
                             <a href="{{ URL::to('/clear-cart') }}" class="btn btn-danger">Xóa toàn bộ giỏ hàng</a>
                         </td>
                     </tr>
                     @else
                     <tr>
-                        <td colspan="8" class="text-center">Giỏ hàng trống!</td>
+                        <td colspan="7" class="text-center">Giỏ hàng trống!</td>
                     </tr>
                     @endif
                 </tbody>
@@ -130,11 +130,10 @@
                 <div class="form-group">
                     <input type="text" name="promotion_code" class="form-control" placeholder="Nhập mã khuyến mãi"
                         value="{{ $promotion_code }}" style="width: 200px; display: inline-block;">
-                    <button type="submit" class="btn btn-warning" style="margin-left: 10px;   ">Áp dụng</button>
+                    <button type="submit" class="btn btn-warning" style="margin-left: 10px;">Áp dụng</button>
                     @if($promotion_code)
                     <a href="{{ URL::to('/clear-promotion') }}" class="btn btn-warning"
-                        style="margin-left: 10px; background-color: red;">Hủy
-                        mã</a>
+                        style="margin-left: 10px; background-color: red;">Hủy mã</a>
                     @endif
                 </div>
                 @if(Session::has('promotion_error'))
@@ -152,6 +151,8 @@
             <input type="hidden" name="promotion_discount" value="{{ $promotion_discount }}">
             <input type="hidden" name="promotion_code" value="{{ $promotion_code }}">
             <input type="hidden" name="product_discount_total" value="{{ $product_discount_total }}">
+            <input type="hidden" name="shipping_fee" value="{{ $shipping_fee }}"> <!-- Gửi shipping_fee -->
+            <input type="hidden" name="subtotal" value="{{ $subtotal }}"> <!-- Gửi subtotal -->
             <div class="payment-options">
                 <span>
                     <label><input name="payment_option" value="bằng thẻ" type="radio" required> Trả bằng thẻ</label>
@@ -174,18 +175,6 @@
     .btn-primary:hover {
         background-color: #0056B3;
         border-color: #0056B3;
-    }
-
-    button .btn-warning {
-        background-color: #007BFF;
-        border-color: #007BFF;
-
-    }
-
-    button .btn-warning:hover {
-        background-color: #0056B3;
-        border-color: #0056B3;
-
     }
 
     .btn-warning {

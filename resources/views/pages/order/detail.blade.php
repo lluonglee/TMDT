@@ -1,5 +1,4 @@
 @extends('layout')
-
 @section('content')
 <div class="container">
     <h2 style="color: #007BFF;">Chi Tiết Đơn Hàng</h2>
@@ -39,6 +38,10 @@
             <td style="color: #28A745;">-{{ number_format($order->discount_amount, 0, ',', '.') }} VNĐ</td>
         </tr>
         @endif
+        <tr>
+            <th>Phí Ship</th>
+            <td>{{ number_format($order->shipping_fee, 0, ',', '.') }} VNĐ</td>
+        </tr>
         <tr>
             <th>Thành Tiền</th>
             <td><strong>{{ number_format($order->order_total, 0, ',', '.') }} VNĐ</strong></td>

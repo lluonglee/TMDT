@@ -13,6 +13,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ShippingFeeController;
+use App\Http\Controllers\StatistiController;
+
 
 
 
@@ -153,3 +155,6 @@ Route::post('/promotions', [PromotionController::class, 'store'])->name('admin.p
 Route::get('/promotions/{id}/edit', [PromotionController::class, 'edit'])->name('admin.promotions.edit');
 Route::put('/promotions/{id}', [PromotionController::class, 'update'])->name('admin.promotions.update');
 Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name('admin.promotions.destroy');
+
+//
+Route::get('/statistics', [StatistiController::class, 'index'])->name('statistics');

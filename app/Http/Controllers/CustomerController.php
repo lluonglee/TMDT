@@ -358,7 +358,7 @@ class CustomerController extends Controller
         Session::put('shipping_id', $shipping_id);
         Session::put('shipping_fee', $shipping_fee);
 
-        return Redirect::to('/payment');
+        return Redirect::to('/show-cart');
     }
 
 

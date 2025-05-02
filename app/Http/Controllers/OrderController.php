@@ -124,6 +124,13 @@ class OrderController extends Controller
             return Redirect::back()->with('error', 'Giỏ hàng trống, không thể đặt hàng!');
         }
 
+        // Lấy shipping_fee từ tbl_shipping
+        $shipping = DB::table('tbl_shipping')
+            ->where('shipping_id', $shipping_id)
+            ->select('shipping_fee')
+            ->first();
+        $shipping_fee = $shipping ? ($shipping->shipping_fee ?? 0) : 0;
+
         // Tính tổng tiền, giảm giá sản phẩm, và giảm giá mã
         $subtotal = 0;
         $product_discount_total = $request->product_discount_total ?? 0;
@@ -140,8 +147,8 @@ class OrderController extends Controller
         $total_after_product_discount = $subtotal - $product_discount_total;
         $promotion_discount = min($promotion_discount, $total_after_product_discount);
 
-        // Tính tổng tiền đơn hàng, đảm bảo không âm
-        $order_total = max(0, $total_after_product_discount - $promotion_discount);
+        // Tính tổng tiền đơn hàng, bao gồm shipping_fee
+        $order_total = max(0, $total_after_product_discount - $promotion_discount + $shipping_fee);
 
         // Thêm thông tin thanh toán
         $payment_id = DB::table('tbl_payment')->insertGetId([
@@ -156,6 +163,7 @@ class OrderController extends Controller
             'shipping_id' => $shipping_id,
             'payment_id' => $payment_id,
             'order_total' => $order_total,
+            'shipping_fee' => $shipping_fee, // Lưu shipping_fee
             'discount_code' => $promotion_code,
             'discount_amount' => $promotion_discount,
             'order_status' => 'Đang xử lý',
@@ -185,22 +193,19 @@ class OrderController extends Controller
                 ->increment('used_count');
         }
 
-
-        //     // Gửi email thông báo đơn hàng thành công
+        // Gửi email thông báo đơn hàng thành công (nếu bật)
         // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
         // if ($customer_email) {
-        //     $orderInfo = [  // Pass any order-related info to the email
+        //     $orderInfo = [
         //         'order_id' => $order_id,
         //         'order_total' => $order_total,
+        //         'shipping_fee' => $shipping_fee, // Thêm shipping_fee
         //     ];
-
         //     Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
         // }
 
-        // Xóa giỏ hàng và mã khuyến mãi
-        Session::forget('cart');
-        Session::forget('promotion_discount');
-        Session::forget('promotion_code');
+        // Xóa giỏ hàng, mã khuyến mãi và shipping
+        Session::forget(['cart', 'promotion_discount', 'promotion_code', 'shipping_id', 'shipping_fee']);
 
         // Điều hướng
         if ($request->payment_option == 'bằng thẻ') {
@@ -210,59 +215,53 @@ class OrderController extends Controller
         }
     }
 
-
-
-
-
-
     public function thank_you()
     {
         $categories = DB::table('tbl_category_product')
-            ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+            ->where('category_status', '1')
             ->orderBy('category_id', 'desc')
             ->get();
 
         $brands = DB::table('tbl_brand')
-            ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+            ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
 
         return view('pages.thankyou.thank_you')->with([
-            'categories' => $categories, // Truyền đúng biến
+            'categories' => $categories,
             'brands' => $brands,
-
         ]);
     }
+
     public function orderHistory()
     {
         $categories = DB::table('tbl_category_product')
-            ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+            ->where('category_status', '1')
             ->orderBy('category_id', 'desc')
             ->get();
 
         $brands = DB::table('tbl_brand')
-            ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+            ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
-        $customer_id = Session::get('customer_id');
 
+        $customer_id = Session::get('customer_id');
         if (!$customer_id) {
             return redirect('/login')->with('error', 'Vui lòng đăng nhập để xem lịch sử đơn hàng.');
         }
 
-        // Lấy danh sách đơn hàng của khách hàng
+        // Lấy danh sách đơn hàng của khách hàng, bao gồm shipping_fee
         $orders = DB::table('tbl_order')
             ->where('customer_id', $customer_id)
+            ->select('order_id', 'order_total', 'order_status', 'discount_code', 'discount_amount', 'created_at', 'shipping_fee')
             ->orderBy('created_at', 'desc')
             ->get();
 
         return view('pages.order.history', compact('orders'))->with([
-            'categories' => $categories, // Truyền đúng biến
+            'categories' => $categories,
             'brands' => $brands,
-
-        ]);;
+        ]);
     }
-
 
     public function orderDetail($order_id)
     {
@@ -284,7 +283,7 @@ class OrderController extends Controller
         $order = DB::table('tbl_order')
             ->where('order_id', $order_id)
             ->where('customer_id', $customer_id)
-            ->select('order_id', 'order_total', 'order_status', 'discount_code', 'discount_amount', 'created_at', 'shipping_id', 'payment_id')
+            ->select('order_id', 'order_total', 'order_status', 'discount_code', 'discount_amount', 'created_at', 'shipping_id', 'payment_id', 'shipping_fee')
             ->first();
 
         if (!$order) {
@@ -327,24 +326,22 @@ class OrderController extends Controller
         return view('pages.order.detail', compact('order', 'order_details', 'categories', 'brands', 'shipping', 'payment', 'subtotal', 'product_discount_total'));
     }
 
-
     public function manage_order()
     {
         $all_orders = DB::table('tbl_order')
             ->join('tbl_customer', 'tbl_order.customer_id', '=', 'tbl_customer.customer_id')
-            ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id') // Thêm dòng này
+            ->join('tbl_payment', 'tbl_order.payment_id', '=', 'tbl_payment.payment_id')
             ->select(
                 'tbl_order.*',
                 'tbl_customer.customer_name',
-                'tbl_payment.payment_method' // Lấy phương thức thanh toán
+                'tbl_payment.payment_method',
+                'tbl_order.shipping_fee' // Thêm shipping_fee
             )
             ->orderBy('tbl_order.order_id', 'desc')
             ->get();
 
         return view('admin.manage_order')->with('all_orders', $all_orders);
     }
-
-
 
     public function view_order($orderId)
     {
@@ -362,6 +359,7 @@ class OrderController extends Controller
                 'tbl_order.discount_code',
                 'tbl_order.discount_amount',
                 'tbl_order.created_at',
+                'tbl_order.shipping_fee', // Thêm shipping_fee
                 'tbl_customer.customer_name',
                 'tbl_customer.customer_email',
                 'tbl_customer.customer_phone',
@@ -405,7 +403,6 @@ class OrderController extends Controller
             'product_discount_total' => $product_discount_total,
         ]);
     }
-
     public function updateOrderStatus(Request $request, $orderId)
     {
         // Validate trạng thái đơn hàng

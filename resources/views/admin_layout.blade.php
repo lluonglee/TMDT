@@ -110,6 +110,16 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
 
                         {{-- Dành riêng cho admin --}}
                         @if(Session::has('admin_id'))
+
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-book"></i>
+                                <span>Thống kê</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('/statistics') }}">Thống kê</a></li>
+                            </ul>
+                        </li>
                         <li class="sub-menu">
                             <a href="javascript:;">
                                 <i class="fa fa-book"></i>

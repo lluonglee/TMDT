@@ -15,6 +15,7 @@
                             <th>Mã đơn hàng</th>
                             <th>Tên khách hàng</th>
                             <th>Tổng tiền</th>
+                            <th>Phí Ship</th>
                             <th>Hình thức thanh toán</th>
                             <th>Trạng thái</th>
                             <th>Ngày đặt</th>
@@ -23,11 +24,11 @@
                     </thead>
                     <tbody>
                         @foreach($all_orders as $order)
-
                         <tr>
                             <td>{{ $order->order_id }}</td>
                             <td>{{ $order->customer_name }}</td>
                             <td>{{ number_format($order->order_total, 0, ',', '.') }} VNĐ</td>
+                            <td>{{ number_format($order->shipping_fee, 0, ',', '.') }} VNĐ</td>
                             <td>{{ $order->payment_method }}</td>
                             <td>
                                 @if($order->order_status == 'Đang xử lý')
@@ -44,7 +45,6 @@
                                     class="active">
                                     <i class="fa fa-eye text-primary"></i>
                                 </a>
-
                                 <a style="font-size: 25px;" href="{{ url('/delete-order/'.$order->order_id) }}"
                                     onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?');" class="active">
                                     <i class="fa fa-trash text-danger"></i>
@@ -54,7 +54,6 @@
                         @endforeach
                     </tbody>
                 </table>
-
             </div>
         </section>
     </div>
