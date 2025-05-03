@@ -156,6 +156,7 @@ Route::delete('/promotions/{id}', [PromotionController::class, 'destroy'])->name
 Route::get('/statistics', [StatistiController::class, 'index'])->name('statistics');
 //vnpay
 Route::post('/order-place', [CheckoutController::class, 'order_place'])->name('order.place');
+
 Route::get('/vnpay/callback', [VNPayController::class, 'callback'])->name('vnpay.callback');
 Route::get('/checkout/result', function () {
     return view('checkout_result');

@@ -14,7 +14,7 @@ class VNPayController extends Controller
     {
         Log::info('VNPay callback received', $request->all());
 
-        $vnp_HashSecret = config('vnpay.hash_secret');
+        $vnp_HashSecret = 'R9AYAGT6A9M89N99AVPNRSXRKV6DOFTT';
         $vnp_SecureHash = $request->query('vnp_SecureHash');
         $inputData = $request->query();
 

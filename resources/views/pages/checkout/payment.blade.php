@@ -153,7 +153,6 @@
 
         <!-- Form thanh toán -->
         <h4 style="margin: 40px 0; font-size: 20px;">Chọn hình thức thanh toán</h4>
-        <p style="color: #DC3545; font-weight: bold;">Lưu ý: Với thanh toán VNPay, vui lòng hoàn tất trong 30 phút!</p>
         <form action="{{ URL::to('/order-place') }}" method="POST" id="payment-form">
             @csrf
             <input type="hidden" name="total_vnpay" value="{{ $total_after }}">
