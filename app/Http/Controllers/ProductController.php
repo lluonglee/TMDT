@@ -190,6 +190,10 @@ class ProductController extends Controller
             ->select('tbl_product_reviews.*', 'tbl_customer.customer_name')
             ->orderBy('tbl_product_reviews.created_at', 'desc')
             ->get();
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
 
         return view('pages.sanpham.show_detail')->with([
@@ -198,6 +202,7 @@ class ProductController extends Controller
             'detail_product' => $detail_product, // Truyền sản phẩm vào View
             'related_products' => $related_products,
             'tbl_product_reviews' => $reviews,
+            'messages' => $messages
         ]);
     }
 

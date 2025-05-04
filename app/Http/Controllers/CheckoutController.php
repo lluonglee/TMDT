@@ -72,6 +72,7 @@ class CheckoutController extends Controller
                 'created_at' => Carbon::now(),
             ]);
 
+            $session_id = session()->getId();
             $order_id = DB::table('tbl_order')->insertGetId([
                 'customer_id' => $customer_id,
                 'shipping_id' => $shipping_id,
@@ -81,6 +82,7 @@ class CheckoutController extends Controller
                 'discount_code' => $promotion_code,
                 'discount_amount' => $promotion_discount,
                 'order_status' => 'Đang xử lý',
+                'session_id' => $session_id,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
@@ -118,23 +120,24 @@ class CheckoutController extends Controller
                     ->increment('used_count');
             }
 
-            // Gửi email thông báo đơn hàng
-            $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
-            if ($customer_email) {
-                $orderInfo = [
-                    'order_id' => $order_id,
-                    'order_total' => $order_total,
-                    'shipping_fee' => $shipping_fee,
-                ];
-                try {
-                    Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
-                    Log::info('Order confirmation email sent', ['email' => $customer_email, 'order_id' => $order_id]);
-                } catch (\Exception $e) {
-                    Log::error('Failed to send order confirmation email', ['email' => $customer_email, 'error' => $e->getMessage()]);
-                }
-            }
+            // // Gửi email thông báo đơn hàng
+            // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+            // if ($customer_email) {
+            //     $orderInfo = [
+            //         'order_id' => $order_id,
+            //         'order_total' => $order_total,
+            //         'shipping_fee' => $shipping_fee,
+            //     ];
+            //     try {
+            //         Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+            //         Log::info('Order confirmation email sent', ['email' => $customer_email, 'order_id' => $order_id]);
+            //     } catch (\Exception $e) {
+            //         Log::error('Failed to send order confirmation email', ['email' => $customer_email, 'error' => $e->getMessage()]);
+            //     }
+            // }
 
             Session::forget(['cart', 'promotion_discount', 'promotion_code', 'shipping_id', 'shipping_fee']);
+            Session::put('latest_order_id', $order_id);
 
             DB::commit();
         } catch (\Exception $e) {
@@ -162,7 +165,6 @@ class CheckoutController extends Controller
             $vnp_BankCode = $request->input('bankCode', '');
             $vnp_IpAddr = $request->ip();
             $vnp_CreateDate = date('YmdHis');
-            // $vnp_ExpireDate = date('YmdHis', strtotime('+15 minutes'));
 
             $inputData = [
                 'vnp_Version' => '2.1.0',
@@ -177,7 +179,6 @@ class CheckoutController extends Controller
                 'vnp_OrderType' => $vnp_OrderType,
                 'vnp_ReturnUrl' => $vnp_ReturnUrl,
                 'vnp_TxnRef' => $vnp_TxnRef,
-                //'vnp_ExpireDate' => $vnp_ExpireDate,
             ];
 
             if ($vnp_BankCode) {

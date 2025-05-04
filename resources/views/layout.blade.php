@@ -85,30 +85,7 @@
                             <a href="{{ URL('/') }}"><img style="width: 100px; height: 50px; object-fit: cover;"
                                     src="{{ asset('public/frontend/images/logo3.png') }}" alt="" /></a>
                         </div>
-                        <div class="btn-group pull-right">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle usa"
-                                    data-toggle="dropdown">
-                                    USA
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Canada</a></li>
-                                    <li><a href="#">UK</a></li>
-                                </ul>
-                            </div>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default dropdown-toggle usa"
-                                    data-toggle="dropdown">
-                                    DOLLAR
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">Canadian Dollar</a></li>
-                                    <li><a href="#">Pound</a></li>
-                                </ul>
-                            </div>
-                        </div>
+
                     </div>
                     <div class="col-sm-8">
                         <div class="shop-menu pull-right">
@@ -119,12 +96,12 @@
                                 @if(Session::has('shipping_id'))
                                 <li><a href="{{ URL('/payment') }}"><i class="fa fa-money"></i> Thanh toán</a></li>
                                 @else
-                                <li><a href="{{ URL('/checkout') }}" class="btn btn-primary"><i class="fa fa-lock"></i>
+                                <li><a href="{{ URL('/checkout') }}"><i class="fa fa-lock"></i>
                                         Điền thông tin giao hàng</a></li>
                                 @endif
                                 @else
-                                <li><a href="{{ URL('/login-checkout') }}" class="btn btn-primary"><i
-                                            class="fa fa-lock"></i> Đăng nhập để thanh toán</a></li>
+                                <li><a href="{{ URL('/customer/login') }}"><i class="fa fa-lock"></i> Đăng nhập để thanh
+                                        toán</a></li>
                                 @endif
                                 @endif
                                 <li><a href="{{ URL('/show-cart') }}"><i class="fa fa-shopping-cart"></i> Giỏ hàng</a>

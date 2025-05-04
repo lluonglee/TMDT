@@ -2,7 +2,7 @@
 @section('admin_content')
 
 <div class="container">
-    <h2 class="my-3">Thống Kê Đơn Hàng</h2>
+    <h2 class="my-3">Thống Kê Đơn Hàng và Khách Hàng</h2>
 
     {{-- Form lọc --}}
     <form action="{{ url('/statistics') }}" method="GET" class="row g-3 align-items-end mb-4">
@@ -49,9 +49,10 @@
     @endif
 
     {{-- Tổng quan --}}
+    <h4 class="mb-3 section-title">Tổng Quan</h4>
     <div class="row mb-4">
         <div class="col-md-4">
-            <div class="card border-success">
+            <div class="card border-success stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Tổng doanh thu</h5>
                     <p class="card-text text-success fw-bold">
@@ -61,7 +62,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-info">
+            <div class="card border-info stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Tổng phí vận chuyển</h5>
                     <p class="card-text text-info fw-bold">
@@ -71,7 +72,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-dark">
+            <div class="card border-dark stats-card">
                 <div class="card-body">
                     <h5 class="card-title">Tổng số đơn hàng</h5>
                     <p class="card-text fw-bold">
@@ -82,13 +83,48 @@
         </div>
     </div>
 
+    {{-- Thống kê tài khoản khách hàng --}}
+    <h4 class="mb-3 section-title">Thống Kê Tài Khoản Khách Hàng</h4>
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Tổng số khách hàng</h5>
+                    <p class="card-text text-primary fw-bold">
+                        {{ $customer_stats['total_customers'] ?? 0 }} khách hàng
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-warning stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Khách hàng mới</h5>
+                    <p class="card-text text-warning fw-bold">
+                        {{ $customer_stats['new_customers'] ?? 0 }} khách hàng
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success stats-card">
+                <div class="card-body">
+                    <h5 class="card-title">Khách hàng có đơn hàng</h5>
+                    <p class="card-text text-success fw-bold">
+                        {{ $customer_stats['active_customers'] ?? 0 }} khách hàng
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Thống kê trạng thái đơn --}}
-    <h4 class="mb-3">Trạng Thái Đơn Hàng</h4>
+    <h4 class="mb-3 section-title">Trạng Thái Đơn Hàng</h4>
     <div class="row mb-4">
         @if($status_stats->isNotEmpty())
         @foreach($status_stats as $stat)
         <div class="col-md-3">
-            <div class="card border-secondary">
+            <div class="card border-secondary stats-card">
                 <div class="card-body">
                     <h6 class="card-title">Trạng thái: {{ $stat->order_status }}</h6>
                     <p class="mb-1">Số đơn: <strong>{{ $stat->order_count }}</strong></p>
@@ -106,8 +142,8 @@
     </div>
 
     {{-- Biểu đồ doanh thu theo tháng --}}
-    <h4 class="mb-3">Biểu Đồ Doanh Thu Theo Tháng</h4>
-    <div class="card mb-4">
+    <h4 class="mb-3 section-title">Biểu Đồ Doanh Thu Theo Tháng</h4>
+    <div class="card mb-4 stats-card">
         <div class="card-body">
             @if(!empty($chart_labels))
             <canvas id="revenueChart" height="100" data-labels="{{ json_encode($chart_labels) }}"
@@ -120,8 +156,8 @@
     </div>
 
     {{-- Top sản phẩm bán chạy --}}
-    <h4 class="mb-3">Top 5 Sản Phẩm Bán Chạy</h4>
-    <table class="table table-bordered">
+    <h4 class="mb-3 section-title">Top 5 Sản Phẩm Bán Chạy</h4>
+    <table class="table table-bordered table-stats">
         <thead class="table-light">
             <tr>
                 <th>#</th>
@@ -146,6 +182,165 @@
         </tbody>
     </table>
 </div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #007BFF;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+        padding: 8px;
+        font-size: 0.9rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #007BFF;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn-primary {
+        background-color: #007BFF;
+        border: none;
+        padding: 8px 20px;
+        font-size: 0.9rem;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .alert-warning {
+        border-radius: 5px;
+        padding: 12px;
+        font-size: 0.9rem;
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+    }
+
+    .stats-card {
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #fff;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-card .card-body {
+        padding: 20px;
+    }
+
+    .stats-card .card-title {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .stats-card .card-text {
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .table-stats {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+
+    .table-stats th,
+    .table-stats td {
+        padding: 12px;
+        font-size: 0.9rem;
+        vertical-align: middle;
+    }
+
+    .table-stats th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .table-stats tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 15px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+        }
+
+        .stats-card {
+            margin-bottom: 15px;
+        }
+
+        .stats-card .card-title {
+            font-size: 1rem;
+        }
+
+        .stats-card .card-text {
+            font-size: 1.1rem;
+        }
+
+        .form-control,
+        .btn-primary {
+            font-size: 0.85rem;
+        }
+
+        .table-stats th,
+        .table-stats td {
+            font-size: 0.85rem;
+            padding: 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+
+        .col-md-4,
+        .col-md-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+
+        .stats-card {
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
 
 {{-- ChartJS script --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

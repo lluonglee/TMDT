@@ -12,13 +12,14 @@ class ChatController extends Controller
 {
     public function sendMessage(Request $request)
     {
-        $message = $request->input('message');
+        $message = trim($request->input('message'));
         if (!$message) {
-            return redirect()->back()->with('error', 'Tin nhắn không được để trống!');
+            return redirect()->back()->with('error', 'Tin nhắn không được để trống!')->with('chat_open', true);
         }
 
         $session_id = session()->getId();
 
+        // Lưu tin nhắn người dùng
         DB::table('tbl_chat_messages')->insert([
             'session_id' => $session_id,
             'message' => $message,
@@ -27,10 +28,10 @@ class ChatController extends Controller
             'updated_at' => now()
         ]);
 
-        $botMessage = str_contains(strtolower($message), 'mã đơn hàng')
-            ? (session('latest_order_id') ? "Mã đơn hàng của bạn là: " . session('latest_order_id') : "Bạn chưa có đơn hàng!")
-            : "Tôi đã nhận được tin nhắn của bạn!";
+        // Kiểm tra yêu cầu về đơn hàng
+        $botMessage = $this->generateBotResponse($message, $session_id);
 
+        // Lưu phản hồi bot
         DB::table('tbl_chat_messages')->insert([
             'session_id' => $session_id,
             'message' => $botMessage,
@@ -42,6 +43,27 @@ class ChatController extends Controller
         return redirect()->back()->with('success', 'Tin nhắn đã gửi!')->with('chat_open', true);
     }
 
+    private function generateBotResponse($message, $session_id)
+    {
+        $lowerMessage = strtolower($message);
+
+        // Kiểm tra các từ khóa liên quan đến đơn hàng
+        if (str_contains($lowerMessage, 'đơn hàng của tôi') || str_contains($lowerMessage, 'đơn hàng') || str_contains($lowerMessage, 'đặt hàng')) {
+            $order = DB::table('tbl_order')
+                ->where('session_id', $session_id)
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($order) {
+                return "Đơn hàng của bạn: Mã đơn hàng: {$order->order_id}, Trạng thái: {$order->order_status}, Tổng tiền: " . number_format($order->order_total, 2) . " VNĐ";
+            }
+            return "Bạn chưa có đơn hàng nào!";
+        }
+
+        // Phản hồi mặc định
+        return "Tôi đã nhận được tin nhắn của bạn!";
+    }
+
     public function getHistory()
     {
         $session_id = session()->getId();
@@ -49,5 +71,10 @@ class ChatController extends Controller
             ->where('session_id', $session_id)
             ->get();
         return view('partials.chat_messages', compact('messages'));
+    }
+
+    public function getSessionId()
+    {
+        return session()->getId();
     }
 }

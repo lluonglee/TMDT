@@ -165,3 +165,4 @@ Route::get('/checkout/result', function () {
 // Routes cho chatbox
 Route::post('/chat/send', [ChatController::class, 'sendMessage']);
 Route::get('/chat/history', [ChatController::class, 'getHistory']);
+Route::get('/session-id', [ChatController::class, 'getSessionId']);

@@ -50,16 +50,18 @@ class CustomerController extends Controller
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|unique:tbl_customer,customer_email',
-            'customer_password' => 'required|string|min:3|confirmed',  // Ràng buộc mật khẩu ít nhất 3 ký tự và phải khớp với xác nhận
-            'customer_phone' => 'required|string|max:15', // Giới hạn số điện thoại tối đa 15 ký tự
+            'customer_password' => 'required|string|min:3|confirmed',
+            'customer_phone' => 'required|string|max:15',
         ]);
 
         // Nếu validation thành công, tiếp tục xử lý dữ liệu
         $data = [
             'customer_name' => $request->input('customer_name'),
             'customer_email' => $request->input('customer_email'),
-            'customer_password' => Hash::make($request->input('customer_password')), // Mã hóa an toàn
+            'customer_password' => Hash::make($request->input('customer_password')),
             'customer_phone' => $request->input('customer_phone'),
+            'created_at' => now(), // Thêm thời gian tạo
+            'updated_at' => now(), // Thêm thời gian cập nhật
         ];
 
         // Chèn thông tin khách hàng vào cơ sở dữ liệu
@@ -72,7 +74,6 @@ class CustomerController extends Controller
         // Chuyển hướng tới trang checkout
         return Redirect::to('/checkout');
     }
-
 
     // Xử lý đăng nhập khách hàng
     // public function login(Request $request)

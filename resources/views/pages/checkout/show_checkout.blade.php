@@ -50,5 +50,30 @@
         </div>
     </div>
 </section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#matp').on('change', function() {
+        var matp = $(this).val();
+        if (matp) {
+            $.ajax({
+                url: '/shipping-fees/get-districts/' + matp,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    $('#maqh').empty();
+                    $('#maqh').append('<option value="">Chọn quận/huyện</option>');
+                    $.each(data, function(key, district) {
+                        $('#maqh').append('<option value="' + district.maqh + '">' +
+                            district.name + '</option>');
+                    });
+                }
+            });
+        } else {
+            $('#maqh').empty().append('<option value="">Chọn quận/huyện</option>');
+        }
+    });
+});
+</script>
 
 @endsection

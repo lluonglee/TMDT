@@ -172,6 +172,10 @@ class ShippingFeeController extends Controller
             ->get();
 
         $shipping_fee = $shipping->shipping_fee ?? 0;
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
         return view('pages.checkout.edit_checkout')->with([
             'categories' => $categories,
@@ -179,6 +183,7 @@ class ShippingFeeController extends Controller
             'provinces' => $provinces,
             'shipping' => $shipping,
             'shipping_fee' => $shipping_fee,
+            'messages' => $messages
         ]);
     }
 
