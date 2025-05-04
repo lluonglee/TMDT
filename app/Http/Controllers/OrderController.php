@@ -226,10 +226,16 @@ class OrderController extends Controller
             ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
+
 
         return view('pages.thankyou.thank_you')->with([
             'categories' => $categories,
             'brands' => $brands,
+            'messages' => $messages
         ]);
     }
 
@@ -245,6 +251,7 @@ class OrderController extends Controller
             ->orderBy('brand_id', 'desc')
             ->get();
 
+
         $customer_id = Session::get('customer_id');
         if (!$customer_id) {
             return redirect('/login')->with('error', 'Vui lòng đăng nhập để xem lịch sử đơn hàng.');
@@ -256,10 +263,15 @@ class OrderController extends Controller
             ->select('order_id', 'order_total', 'order_status', 'discount_code', 'discount_amount', 'created_at', 'shipping_fee')
             ->orderBy('created_at', 'desc')
             ->get();
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
         return view('pages.order.history', compact('orders'))->with([
             'categories' => $categories,
             'brands' => $brands,
+            'messages' => $messages
         ]);
     }
 
@@ -310,6 +322,10 @@ class OrderController extends Controller
             ->where('payment_id', $order->payment_id)
             ->select('payment_method', 'payment_status')
             ->first();
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
         $subtotal = 0;
         $product_discount_total = 0;
@@ -323,7 +339,7 @@ class OrderController extends Controller
         $total_after_product_discount = $subtotal - $product_discount_total;
         $order->discount_amount = min($order->discount_amount ?? 0, $total_after_product_discount);
 
-        return view('pages.order.detail', compact('order', 'order_details', 'categories', 'brands', 'shipping', 'payment', 'subtotal', 'product_discount_total'));
+        return view('pages.order.detail', compact('order', 'order_details', 'categories', 'brands', 'shipping', 'payment', 'subtotal', 'product_discount_total', 'messages'));
     }
 
     public function manage_order()

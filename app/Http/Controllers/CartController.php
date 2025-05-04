@@ -70,8 +70,12 @@ class CartController extends Controller
             ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
-        return view('pages.cart.show_cart', compact('categories', 'brands', 'subtotal', 'shipping_fee'));
+        return view('pages.cart.show_cart', compact('categories', 'brands', 'subtotal', 'shipping_fee', 'messages'));
     }
 
     public function remove_cart($product_id)

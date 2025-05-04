@@ -18,31 +18,32 @@ class HomeController extends Controller
     public function index()
     {
         $categories = DB::table('tbl_category_product')
-            ->where('category_status', '1') // Chỉ lấy danh mục đang hiển thị
+            ->where('category_status', '1')
             ->orderBy('category_id', 'desc')
             ->get();
 
         $brands = DB::table('tbl_brand')
-            ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+            ->where('brand_status', '1')
             ->orderBy('brand_id', 'desc')
             ->get();
 
-        // $all_product = DB::table('tbl_product')
-        //     ->join('tbl_category_product', 'tbl_product.category_id', '=', 'tbl_category_product.category_id')
-        //     ->join('tbl_brand', 'tbl_product.brand_id', '=', 'tbl_brand.brand_id')
-        //     ->select('tbl_product.*', 'tbl_category_product.category_name', 'tbl_brand.brand_name')
-        //     ->get();
-
         $all_product = DB::table('tbl_product')
-            ->where('product_status', '1') // Chỉ lấy thương hiệu đang hiển thị
+            ->where('product_status', '1')
             ->orderBy('product_id', 'desc')
-            // ->Limit(5)
+            ->get();
+
+
+
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
             ->get();
 
         return view('pages.home')->with([
-            'categories' => $categories, // Truyền đúng biến
+            'categories' => $categories,
             'brands' => $brands,
-            'all_product' => $all_product
+            'all_product' => $all_product,
+            'messages' => $messages
         ]);
     }
     public function search(Request $request)
@@ -57,6 +58,11 @@ class HomeController extends Controller
             ->orderBy('brand_id', 'desc')
             ->get();
 
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
+
         $keywords = $request->input('keywords'); // Lấy từ khóa từ ô tìm kiếm
 
         $search_results = DB::table('tbl_product')
@@ -68,7 +74,8 @@ class HomeController extends Controller
             'categories' => $categories, // Truyền đúng biến
             'brands' => $brands,
             'search_results' => $search_results,
-            'keywords' => $keywords
+            'keywords' => $keywords,
+            'messages' => $messages
         ]);
     }
 }

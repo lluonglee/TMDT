@@ -121,15 +121,21 @@ class BrandProduct extends Controller
             ->orderBy('tbl_product.product_id', 'desc')
             ->get();
 
+
         $brand_name = DB::table('tbl_brand')
             ->where('brand_id', $brand_id)
             ->value('brand_name');
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
         return view('pages.brand.show_brand')->with([
             'categories' => $categories,
             'brands' => $brands,
             'brand_by_id' => $brand_by_id,
-            'brand_name' => $brand_name
+            'brand_name' => $brand_name,
+            'messages' => $messages
         ]);
     }
 }

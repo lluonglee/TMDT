@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BrandProduct;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryProduct;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CustomerController;
@@ -161,3 +162,6 @@ Route::get('/vnpay/callback', [VNPayController::class, 'callback'])->name('vnpay
 Route::get('/checkout/result', function () {
     return view('checkout_result');
 })->name('checkout.result');
+// Routes cho chatbox
+Route::post('/chat/send', [ChatController::class, 'sendMessage']);
+Route::get('/chat/history', [ChatController::class, 'getHistory']);

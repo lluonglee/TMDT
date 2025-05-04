@@ -292,10 +292,16 @@ class CustomerController extends Controller
             ->orderBy('name')
             ->get();
 
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
+
         return view('pages.checkout.show_checkout')->with([
             'categories' => $categories,
             'brands' => $brands,
             'provinces' => $provinces,
+            'messages' => $messages
         ]);
     }
 
@@ -373,10 +379,15 @@ class CustomerController extends Controller
             ->where('brand_status', '1') // Chỉ lấy thương hiệu đang hiển thị
             ->orderBy('brand_id', 'desc')
             ->get();
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
 
         return view('pages.checkout.payment')->with([
             'categories' => $categories, // Truyền đúng biến
             'brands' => $brands,
+            'messages' => $messages
 
         ]);
     }

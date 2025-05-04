@@ -115,6 +115,7 @@ class CategoryProduct extends Controller
             ->orderBy('brand_id', 'desc')
             ->get();
 
+
         // Lấy sản phẩm thuộc danh mục
         $category_by_id = DB::table('tbl_product')
             ->join('tbl_category_product', 'tbl_product.category_id', '=', 'tbl_category_product.category_id')
@@ -127,12 +128,16 @@ class CategoryProduct extends Controller
         $category_name = DB::table('tbl_category_product')
             ->where('category_id', $category_id)
             ->value('category_name'); // Lấy duy nhất 1 giá trị của category_name
-
+        $session_id = session()->getId();
+        $messages = DB::table('tbl_chat_messages')
+            ->where('session_id', $session_id)
+            ->get();
         return view('pages.category.show_category')->with([
             'categories' => $categories,
             'brands' => $brands,
             'category_by_id' => $category_by_id,
-            'category_name' => $category_name // Truyền thêm biến này
+            'category_name' => $category_name, // Truyền thêm biến này
+            'messages' => $messages
         ]);
     }
 }
