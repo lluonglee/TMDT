@@ -9,6 +9,20 @@
                 <div class="alert alert-success">{{ Session::get('message') }}</div>
                 @endif
 
+                <!-- Form lọc trạng thái -->
+                <form method="GET" action="{{ url('/admin/orders') }}" class="form-inline mb-3">
+                    <label for="status" class="mr-2">Lọc theo trạng thái:</label>
+                    <select name="status" id="status" class="form-control mr-2">
+                        <option value="">Tất cả</option>
+                        <option value="Đang xử lý" {{ request('status') == 'Đang xử lý' ? 'selected' : '' }}>Đang xử lý
+                        </option>
+                        <option value="Hoàn thành" {{ request('status') == 'Hoàn thành' ? 'selected' : '' }}>Hoàn thành
+                        </option>
+                        <option value="Đã hủy" {{ request('status') == 'Đã hủy' ? 'selected' : '' }}>Đã hủy</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Lọc</button>
+                </form>
+
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -23,7 +37,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($all_orders as $order)
+                        @forelse($all_orders as $order)
                         <tr>
                             <td>{{ $order->order_id }}</td>
                             <td>{{ $order->customer_name }}</td>
@@ -33,7 +47,7 @@
                             <td>
                                 @if($order->order_status == 'Đang xử lý')
                                 <span class="text-warning">{{ $order->order_status }}</span>
-                                @elseif($order->order_status == 'Đã giao')
+                                @elseif($order->order_status == 'Hoàn thành')
                                 <span class="text-success">{{ $order->order_status }}</span>
                                 @else
                                 <span class="text-danger">{{ $order->order_status }}</span>
@@ -51,13 +65,18 @@
                                 </a>
                             </td>
                         </tr>
-                        @endforeach
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center">Không có đơn hàng nào.</td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         </section>
     </div>
 </div>
+
 <style>
     .table th,
     .table td {

@@ -46,34 +46,38 @@ class CustomerController extends Controller
     // }
     public function register(Request $request)
     {
-        // Kiểm tra dữ liệu đầu vào với validation
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|unique:tbl_customer,customer_email',
-            'customer_password' => 'required|string|min:3|confirmed',
+            'customer_password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/'
+            ],
             'customer_phone' => 'required|string|max:15',
+        ], [
+            'customer_password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và ký tự đặc biệt.',
         ]);
 
-        // Nếu validation thành công, tiếp tục xử lý dữ liệu
         $data = [
             'customer_name' => $request->input('customer_name'),
             'customer_email' => $request->input('customer_email'),
             'customer_password' => Hash::make($request->input('customer_password')),
             'customer_phone' => $request->input('customer_phone'),
-            'created_at' => now(), // Thêm thời gian tạo
-            'updated_at' => now(), // Thêm thời gian cập nhật
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
 
-        // Chèn thông tin khách hàng vào cơ sở dữ liệu
         $customer_id = DB::table('tbl_customer')->insertGetId($data);
 
-        // Lưu thông tin khách hàng vào session
         Session::put('customer_id', $customer_id);
         Session::put('customer_name', $request->input('customer_name'));
 
-        // Chuyển hướng tới trang checkout
         return Redirect::to('/checkout');
     }
+
 
     // Xử lý đăng nhập khách hàng
     // public function login(Request $request)
@@ -217,8 +221,16 @@ class CustomerController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$/'
+            ],
             'token' => 'required',
+        ], [
+            'password.regex' => 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và ký tự đặc biệt.',
         ]);
 
         // Kiểm tra token và email

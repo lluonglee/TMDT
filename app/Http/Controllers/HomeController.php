@@ -67,7 +67,6 @@ class HomeController extends Controller
 
         $search_results = DB::table('tbl_product')
             ->where('product_name', 'LIKE', "%{$keywords}%")
-            ->orWhere('product_desc', 'LIKE', "%{$keywords}%")
             ->get();
 
         return view('pages.sanpham.search')->with([

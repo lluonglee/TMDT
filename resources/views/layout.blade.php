@@ -29,49 +29,49 @@
     <link rel="apple-touch-icon-precomposed"
         href="{{ asset('public/frontend/images/ico/apple-touch-icon-57-precomposed.png') }}">
     <style>
-        /* Phần input tìm kiếm */
-        .col-sm-3 form input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #fff;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #333;
-            background-color: #fff;
-            outline: none;
-            transition: border-color 0.3s ease-in-out;
-        }
+    /* Phần input tìm kiếm */
+    .col-sm-3 form input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #fff;
+        border-radius: 5px;
+        font-size: 16px;
+        color: #333;
+        background-color: #fff;
+        outline: none;
+        transition: border-color 0.3s ease-in-out;
+    }
 
-        .col-sm-3 form input[type="text"]:focus {
-            border-color: #c9302c;
-        }
+    .col-sm-3 form input[type="text"]:focus {
+        border-color: #c9302c;
+    }
 
-        .col-sm-3 form button {
-            padding: 10px 15px;
-            margin-left: 10px;
-            background-color: #d9534f;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
+    .col-sm-3 form button {
+        padding: 10px 15px;
+        margin-left: 10px;
+        background-color: #d9534f;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        display: flex;
+        align-items: center;
+    }
 
-        .col-sm-3 form button:hover {
-            background-color: #c9302c;
-        }
+    .col-sm-3 form button:hover {
+        background-color: #c9302c;
+    }
 
-        .form-flex {
-            display: flex;
-        }
+    .form-flex {
+        display: flex;
+    }
 
-        .col-sm-3 form button i {
-            font-size: 18px;
-            margin-right: 5px;
-        }
+    .col-sm-3 form button i {
+        font-size: 18px;
+        margin-right: 5px;
+    }
     </style>
 </head>
 
@@ -325,48 +325,48 @@
     <script src="{{ asset('public/frontend/js/jquery.prettyPhoto.js') }}"></script>
     <script src="{{ asset('public/frontend/js/main.js') }}"></script>
     <script type="text/javascript">
-        // Tránh xung đột jQuery
-        var $j = jQuery.noConflict();
-        $j(document).ready(function() {
-            console.log('jQuery loaded:', typeof $j);
-            console.log('matp select exists:', $j('#matp').length);
-            $j('#matp').on('change', function() {
-                var matp = $j(this).val();
-                console.log('Selected matp:', matp);
-                $j('#maqh').empty().append('<option value="">Cả tỉnh</option>');
-                if (matp) {
-                    $j.ajax({
-                        url: '{{ route("shipping_fees.get_districts", ":matp") }}'.replace(':matp',
-                            matp),
-                        type: 'GET',
-                        headers: {
-                            'X-CSRF-TOKEN': $j('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            console.log('AJAX request started');
-                            $j('#maqh').prop('disabled', true).append(
-                                '<option>Loading...</option>');
-                        },
-                        success: function(data) {
-                            console.log('Districts:', data);
-                            $j('#maqh').prop('disabled', false).empty().append(
-                                '<option value="">Cả tỉnh</option>');
-                            $j.each(data, function(key, district) {
-                                $j('#maqh').append('<option value="' + district.maqh +
-                                    '">' + district.name + '</option>');
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            console.log('AJAX Error:', xhr.status, error, xhr.responseText);
-                            $j('#maqh').prop('disabled', false).empty().append(
-                                '<option value="">Lỗi tải dữ liệu</option>');
-                        }
-                    });
-                } else {
-                    console.log('No matp selected');
-                }
-            });
+    // Tránh xung đột jQuery
+    var $j = jQuery.noConflict();
+    $j(document).ready(function() {
+        console.log('jQuery loaded:', typeof $j);
+        console.log('matp select exists:', $j('#matp').length);
+        $j('#matp').on('change', function() {
+            var matp = $j(this).val();
+            console.log('Selected matp:', matp);
+            $j('#maqh').empty().append('<option value="">Cả tỉnh</option>');
+            if (matp) {
+                $j.ajax({
+                    url: '{{ route("shipping_fees.get_districts", ":matp") }}'.replace(':matp',
+                        matp),
+                    type: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $j('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        console.log('AJAX request started');
+                        $j('#maqh').prop('disabled', true).append(
+                            '<option>Loading...</option>');
+                    },
+                    success: function(data) {
+                        console.log('Districts:', data);
+                        $j('#maqh').prop('disabled', false).empty().append(
+                            '<option value="">Cả tỉnh</option>');
+                        $j.each(data, function(key, district) {
+                            $j('#maqh').append('<option value="' + district.maqh +
+                                '">' + district.name + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('AJAX Error:', xhr.status, error, xhr.responseText);
+                        $j('#maqh').prop('disabled', false).empty().append(
+                            '<option value="">Lỗi tải dữ liệu</option>');
+                    }
+                });
+            } else {
+                console.log('No matp selected');
+            }
         });
+    });
     </script>
 </body>
 

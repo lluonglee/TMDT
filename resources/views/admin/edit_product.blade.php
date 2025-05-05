@@ -23,7 +23,7 @@
                         </div>
                         <div class="form-group">
                             <label>Giá Nhập</label>
-                            <input type="number" class="form-control" name="product_import_price"
+                            <input min="0" type="number" class="form-control" name="product_import_price"
                                 value="{{ $product->product_import_price }}">
                         </div>
 

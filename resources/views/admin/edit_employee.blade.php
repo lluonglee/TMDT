@@ -54,6 +54,23 @@
                 {{ in_array('manage_customer', $permissions) ? 'checked' : '' }}>
             <label class="form-check-label">Quản lý khách hàng</label>
         </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_comment" class="form-check-input"
+                {{ in_array('manage_comment', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý đánh giá</label>
+        </div>
+
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_promotion" class="form-check-input"
+                {{ in_array('manage_promotion', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý khuyến mãi</label>
+        </div>
+        <div class="form-check">
+            <input type="checkbox" name="permissions[]" value="manage_shipping" class="form-check-input"
+                {{ in_array('manage_shipping', $permissions) ? 'checked' : '' }}>
+            <label class="form-check-label">Quản lý giao hàng</label>
+        </div>
+
     </div>
     <button type="submit" class="btn btn-primary">Cập nhật</button>
 </form>

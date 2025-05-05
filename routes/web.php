@@ -22,6 +22,8 @@ use App\Http\Controllers\VNPayController;
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/trang-chu', [HomeController::class, 'index']);
 Route::post('/tim-kiem', [HomeController::class, 'search']);
+
+
 // danh muc san pham
 Route::get('/danh-muc-san-pham/{category_id}', [CategoryProduct::class, 'show_category']);
 Route::get('/thuong-hieu-san-pham/{brand_id}', [BrandProduct::class, 'show_brand']);
@@ -102,7 +104,7 @@ Route::get('/customer/logout', [CustomerController::class, 'logout']);
 Route::get('/checkout', [CustomerController::class, 'check_out']);
 
 //payment
-Route::post('/order-place', [OrderController::class, 'order_place']);
+// Route::post('/order-place', [OrderController::class, 'order_place']);
 Route::get('/payment-card', [OrderController::class, 'paymentCard']);
 Route::get('/payment-cash', [OrderController::class, 'paymentCash']);
 Route::get('/thank-you', [OrderController::class, 'thank_you']);
@@ -128,6 +130,9 @@ Route::post('/update-shipping', [ShippingFeeController::class, 'updateShipping']
 Route::get('/manage-order', [OrderController::class, 'manage_order']);
 Route::get('/view-order/{orderId}', [OrderController::class, 'view_order']);
 Route::post('/update-order-status/{orderId}', [OrderController::class, 'updateOrderStatus']);
+Route::get('/delete-order/{orderId}', [OrderController::class, 'deleteOrder']);
+Route::get('/admin/orders', [OrderController::class, 'listOrders']);
+
 
 //in hoa đơn
 Route::get('/print-invoice/{orderId}', [OrderController::class, 'print_invoice']);

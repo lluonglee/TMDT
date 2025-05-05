@@ -121,20 +121,20 @@ class CheckoutController extends Controller
             }
 
             // // Gửi email thông báo đơn hàng
-            // $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
-            // if ($customer_email) {
-            //     $orderInfo = [
-            //         'order_id' => $order_id,
-            //         'order_total' => $order_total,
-            //         'shipping_fee' => $shipping_fee,
-            //     ];
-            //     try {
-            //         Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
-            //         Log::info('Order confirmation email sent', ['email' => $customer_email, 'order_id' => $order_id]);
-            //     } catch (\Exception $e) {
-            //         Log::error('Failed to send order confirmation email', ['email' => $customer_email, 'error' => $e->getMessage()]);
-            //     }
-            // }
+            $customer_email = DB::table('tbl_customer')->where('customer_id', $customer_id)->value('customer_email');
+            if ($customer_email) {
+                $orderInfo = [
+                    'order_id' => $order_id,
+                    'order_total' => $order_total,
+                    'shipping_fee' => $shipping_fee,
+                ];
+                try {
+                    Mail::to($customer_email)->send(new OrderSuccessMail($orderInfo, $customer_email));
+                    Log::info('Order confirmation email sent', ['email' => $customer_email, 'order_id' => $order_id]);
+                } catch (\Exception $e) {
+                    Log::error('Failed to send order confirmation email', ['email' => $customer_email, 'error' => $e->getMessage()]);
+                }
+            }
 
             Session::forget(['cart', 'promotion_discount', 'promotion_code', 'shipping_id', 'shipping_fee']);
             Session::put('latest_order_id', $order_id);

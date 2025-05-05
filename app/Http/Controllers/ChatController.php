@@ -47,21 +47,40 @@ class ChatController extends Controller
     {
         $lowerMessage = strtolower($message);
 
-        // Kiểm tra các từ khóa liên quan đến đơn hàng
-        if (str_contains($lowerMessage, 'đơn hàng của tôi') || str_contains($lowerMessage, 'đơn hàng') || str_contains($lowerMessage, 'đặt hàng')) {
-            $order = DB::table('tbl_order')
-                ->where('session_id', $session_id)
-                ->orderBy('created_at', 'desc')
-                ->first();
-
-            if ($order) {
-                return "Đơn hàng của bạn: Mã đơn hàng: {$order->order_id}, Trạng thái: {$order->order_status}, Tổng tiền: " . number_format($order->order_total, 2) . " VNĐ";
-            }
-            return "Bạn chưa có đơn hàng nào!";
+        if (str_contains($lowerMessage, 'đơn hàng')) {
+            return $this->handleOrderInquiry($session_id);
         }
 
-        // Phản hồi mặc định
-        return "Tôi đã nhận được tin nhắn của bạn!";
+        if (str_contains($lowerMessage, 'giờ làm việc') || str_contains($lowerMessage, 'khi nào mở cửa')) {
+            return "Chúng tôi làm việc từ 8:00 đến 17:00 từ thứ 2 đến thứ 7.";
+        }
+
+        if (str_contains($lowerMessage, 'địa chỉ') || str_contains($lowerMessage, 'ở đâu')) {
+            return "Địa chỉ cửa hàng: P1, Tp.Vinh Long";
+        }
+        if (str_contains($lowerMessage, 'áo') || str_contains($lowerMessage, 'quần')) {
+            return "Bạn có thể xem các sản phẩm liên quan tại: " . url('/trang-chu');
+        }
+
+        if (str_contains($lowerMessage, 'sản phẩm') || str_contains($lowerMessage, 'giảm giá')) {
+            return "Bạn có thể xem các sản phẩm đang giảm giá tại trang chủ !!";
+        }
+
+        return "Tôi đã nhận được tin nhắn của bạn! Bạn có thể hỏi tôi về đơn hàng, thời gian làm việc, địa chỉ hoặc sản phẩm.";
+    }
+
+    private function handleOrderInquiry($session_id)
+    {
+        $order = DB::table('tbl_order')
+            ->where('session_id', $session_id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($order) {
+            return "Đơn hàng của bạn: Mã đơn hàng: {$order->order_id}, Trạng thái: {$order->order_status}, Tổng tiền: " . number_format($order->order_total, 0, ',', '.') . " VNĐ";
+        }
+
+        return "Bạn chưa có đơn hàng nào!";
     }
 
     public function getHistory()

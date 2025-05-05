@@ -5,54 +5,54 @@
     <meta charset="UTF-8">
     <title>Hóa đơn #{{ $order->order_id }}</title>
     <style>
-    body {
-        font-family: 'DejaVu Sans', sans-serif;
-        margin: 10px;
-        color: #333;
-    }
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            margin: 10px;
+            color: #333;
+        }
 
-    h2,
-    h4 {
-        color: #007BFF;
-    }
+        h2,
+        h4 {
+            color: #007BFF;
+        }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
 
-    th,
-    td {
-        padding: 10px;
-        border: 1px solid #E7F1FF;
-        text-align: left;
-    }
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #E7F1FF;
+            text-align: left;
+        }
 
-    th {
-        background-color: #E7F1FF;
-        color: #007BFF;
-    }
+        th {
+            background-color: #E7F1FF;
+            color: #007BFF;
+        }
 
-    .text-center {
-        text-align: center;
-    }
+        .text-center {
+            text-align: center;
+        }
 
-    .text-right {
-        text-align: right;
-    }
+        .text-right {
+            text-align: right;
+        }
 
-    .discount {
-        color: #28A745;
-    }
+        .discount {
+            color: #28A745;
+        }
 
-    .total {
-        font-weight: bold;
-    }
+        .total {
+            font-weight: bold;
+        }
 
-    del {
-        color: #999;
-    }
+        del {
+            color: #999;
+        }
     </style>
 </head>
 
@@ -79,14 +79,14 @@
         </tr>
     </table>
 
-    <h4>THÔNG TIN THANH TOÁN</h4>
+    <!-- <h4>THÔNG TIN THANH TOÁN</h4>
     <table>
         <tr>
             <th>Phương thức thanh toán:</th>
             <td>{{ $order->payment_method == 'bằng thẻ' ? 'Thẻ tín dụng' : 'Tiền mặt' }}</td>
         </tr>
 
-    </table>
+    </table> -->
 
     <h4>THÔNG TIN ĐƠN HÀNG</h4>
     <table>

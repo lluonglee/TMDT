@@ -49,7 +49,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         <header class="header fixed-top clearfix" style="background-color: #E0FFFF;">
             <!--logo start-->
             <div class="brand" style="color: white; background-color: #5F9EA0;">
-                <a href="index.html" class="logo">
+                <a href="{{ URL('/dashboard') }}" class="logo">
                     ADMIN
                 </a>
                 <div class="sidebar-toggle-box">
@@ -206,7 +206,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                                 <span>Quản lý phí ship</span>
                             </a>
                             <ul class="sub">
-                                <li><a href="{{ url('shipping-fees') }}">khuyến mãi</a></li>
+                                <li><a href="{{ url('shipping-fees') }}">Giao hàng</a></li>
                             </ul>
                         </li>
                         @endif
@@ -274,6 +274,39 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                             </a>
                             <ul class="sub">
                                 <li><a href="{{ url('/customers-list') }}">Danh sách khách hàng</a></li>
+                            </ul>
+                        </li>
+                        @endif
+                        @if(in_array('manage_comment', $permissions))
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-user"></i>
+                                <span>Comment</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('/reviews') }}">Danh sách comment</a></li>
+                            </ul>
+                        </li>
+                        @endif
+                        @if(in_array('manage_promotion', $permissions))
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-user"></i>
+                                <span>Khuyến mãi</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('/promotions') }}">Danh sách Khuyến mãi</a></li>
+                            </ul>
+                        </li>
+                        @endif
+                        @if(in_array('manage_shipping', $permissions))
+                        <li class="sub-menu">
+                            <a href="javascript:;">
+                                <i class="fa fa-user"></i>
+                                <span>Khách hàng</span>
+                            </a>
+                            <ul class="sub">
+                                <li><a href="{{ url('shipping-fees') }}">Danh sách giao hàng</a></li>
                             </ul>
                         </li>
                         @endif

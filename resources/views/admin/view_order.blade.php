@@ -110,7 +110,7 @@
                 </table>
 
                 <!-- Thông tin thanh toán -->
-                <h4>Thông tin thanh toán</h4>
+                <!-- <h4>Thông tin thanh toán</h4>
                 <table class="table table-bordered">
                     <tr>
                         <th>Phương thức</th>
@@ -120,7 +120,7 @@
                         <th>Trạng thái</th>
                         <td>{{ $order->payment_status }}</td>
                     </tr>
-                </table>
+                </table> -->
 
                 <!-- Chi tiết sản phẩm -->
                 <h4>Chi tiết sản phẩm</h4>
@@ -192,91 +192,91 @@
 </div>
 
 <style>
-/* Tổng thể */
-.panel-heading {
-    background-color: #f0f8ff;
-    color: #004085;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 12px 20px;
-}
+    /* Tổng thể */
+    .panel-heading {
+        background-color: #f0f8ff;
+        color: #004085;
+        font-size: 18px;
+        font-weight: bold;
+        padding: 12px 20px;
+    }
 
-/* Tiêu đề bảng */
-.table th {
-    background-color: #f0f8ff;
-    color: #004085;
-    text-align: left;
-    vertical-align: middle;
-    padding: 10px;
-}
+    /* Tiêu đề bảng */
+    .table th {
+        background-color: #f0f8ff;
+        color: #004085;
+        text-align: left;
+        vertical-align: middle;
+        padding: 10px;
+    }
 
-/* Dữ liệu bảng */
-.table td {
-    border: 1px solid #dee2e6;
-    padding: 10px;
-    vertical-align: middle;
-}
+    /* Dữ liệu bảng */
+    .table td {
+        border: 1px solid #dee2e6;
+        padding: 10px;
+        vertical-align: middle;
+    }
 
-/* Các giá trị tiền tệ canh phải */
-.table td:nth-child(n+3),
-.table th:nth-child(n+3) {
-    text-align: right;
-}
+    /* Các giá trị tiền tệ canh phải */
+    .table td:nth-child(n+3),
+    .table th:nth-child(n+3) {
+        text-align: right;
+    }
 
-/* Các tiêu đề section */
-h4 {
-    margin-top: 30px;
-    font-weight: 600;
-    border-left: 5px solid #007BFF;
-    padding-left: 10px;
-    color: #333;
-}
+    /* Các tiêu đề section */
+    h4 {
+        margin-top: 30px;
+        font-weight: 600;
+        border-left: 5px solid #007BFF;
+        padding-left: 10px;
+        color: #333;
+    }
 
-.table th,
-.table td {
-    color: #000 !important;
-}
+    .table th,
+    .table td {
+        color: #000 !important;
+    }
 
-/* Nút */
-.btn-primary {
-    background-color: #007BFF;
-    border-color: #007BFF;
-    font-weight: 500;
-}
+    /* Nút */
+    .btn-primary {
+        background-color: #007BFF;
+        border-color: #007BFF;
+        font-weight: 500;
+    }
 
-.btn-primary:hover {
-    background-color: #0056B3;
-    border-color: #0056B3;
-}
+    .btn-primary:hover {
+        background-color: #0056B3;
+        border-color: #0056B3;
+    }
 
-.btn-success {
-    background-color: #28A745;
-    border-color: #28A745;
-    font-weight: 500;
-}
+    .btn-success {
+        background-color: #28A745;
+        border-color: #28A745;
+        font-weight: 500;
+    }
 
-.btn-success:hover {
-    background-color: #218838;
-    border-color: #218838;
-}
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
 
-/* Alert */
-.alert-success {
-    background-color: #e2f0d9;
-    color: #155724;
-    font-weight: bold;
-}
+    /* Alert */
+    .alert-success {
+        background-color: #e2f0d9;
+        color: #155724;
+        font-weight: bold;
+    }
 
-/* Select */
-select.form-control {
-    max-width: 300px;
-}
+    /* Select */
+    select.form-control {
+        max-width: 300px;
+    }
 
-/* Tổng cộng in đậm, nổi bật */
-.table tfoot td {
-    font-weight: bold;
-    background-color: #f9f9f9;
-}
+    /* Tổng cộng in đậm, nổi bật */
+    .table tfoot td {
+        font-weight: bold;
+        background-color: #f9f9f9;
+    }
 </style>
 
 @endsection

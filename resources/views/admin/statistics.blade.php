@@ -11,7 +11,7 @@
             <select name="filter_type" id="filter_type" class="form-control" onchange="toggleInputs()">
                 <option value="range" {{ $filter_type === 'range' ? 'selected' : '' }}>Khoảng thời gian</option>
                 <option value="day" {{ $filter_type === 'day' ? 'selected' : '' }}>Ngày</option>
-                <option value="week" {{ $filter_type === 'week' ? 'selected' : '' }}>Tuần</option>
+                <!-- <option value="week" {{ $filter_type === 'week' ? 'selected' : '' }}>Tuần</option> -->
                 <option value="year" {{ $filter_type === 'year' ? 'selected' : '' }}>Năm</option>
             </select>
         </div>

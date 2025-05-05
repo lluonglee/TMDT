@@ -72,7 +72,7 @@
     @endif
 
     <!-- Thông tin thanh toán -->
-    @if($payment)
+    <!-- @if($payment)
     <h3>Thông Tin Thanh Toán</h3>
     <table class="table table-bordered">
         <tr>
@@ -84,7 +84,7 @@
             <td>{{ $payment->payment_status }}</td>
         </tr>
     </table>
-    @endif
+    @endif -->
 
     <!-- Sản phẩm đã mua -->
     <h3>Sản Phẩm Đã Mua</h3>
