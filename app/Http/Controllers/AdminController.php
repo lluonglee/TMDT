@@ -79,9 +79,15 @@ class AdminController extends Controller
 
     public function unlock_customer($id)
     {
-        DB::table('tbl_customer')->where('customer_id', $id)->update(['status' => 1]);
+        DB::table('tbl_customer')->where('customer_id', $id)->update([
+            'status' => 1,
+            'login_attempts' => 0,
+            'last_failed_login' => null
+        ]);
+
         return redirect()->back()->with('message', 'Tài khoản đã được mở khóa.');
     }
+
 
     public function delete_customer($id)
     {

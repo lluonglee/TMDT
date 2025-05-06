@@ -44,6 +44,7 @@ class CustomerController extends Controller
 
     //     return Redirect::to('/checkout');
     // }
+
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -79,57 +80,89 @@ class CustomerController extends Controller
     }
 
 
-    // Xử lý đăng nhập khách hàng
+
     // public function login(Request $request)
     // {
     //     $email = $request->input('email_account');
     //     $password = $request->input('password_account');
 
+    //     $admin_email = $request->input('email_account');
+    //     $admin_password = md5($request->input('password_account'));
+
+    //     $employee = DB::table('tbl_employee')
+    //         ->where('employee_email', $email)
+    //         ->first();
+
     //     $customer = DB::table('tbl_customer')
     //         ->where('customer_email', $email)
     //         ->first();
 
-    //     if ($customer && Hash::check($password, $customer->customer_password)) {
-    //         Session::put('customer_id', $customer->customer_id);
-    //         Session::put('customer_name', $customer->customer_name);
-    //         return Redirect::to('/checkout');
-    //     } else {
-    //         return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu!');
+    //     $admin = DB::table('tbl_admin')
+    //         ->where('admin_email', $admin_email)
+    //         ->where('admin_password', $admin_password)
+    //         ->first();
+
+
+
+    //     if ($employee) {
+    //         if ($employee->status == 0) {
+    //             return Redirect::to('/customer/login')->with('error', 'Tài khoản của bạn đã bị khóa.');
+    //         }
+
+    //         if (Hash::check($password, $employee->employee_password)) {
+    //             Session::put('employee_id', $employee->employee_id);
+    //             Session::put('employee_name', $employee->employee_name);
+    //             Session::put('role', $employee->role);
+    //             Session::put('permissions', json_decode($employee->permissions, true) ?? []); // Lưu phân quyền
+    //             return Redirect::to('/dashboard');
+    //         }
     //     }
+
+    //     if ($customer) {
+    //         if ($customer->status == 0) {
+    //             return Redirect::to('/customer/login')->with('error', 'Tài khoản của bạn đã bị khóa.');
+    //         }
+
+    //         if (Hash::check($password, $customer->customer_password)) {
+    //             Session::put('customer_id', $customer->customer_id);
+    //             Session::put('customer_name', $customer->customer_name);
+    //             return Redirect::to('/');
+    //         }
+    //     }
+    //     if ($admin) {
+    //         Session::put('admin_name', $admin->admin_name);
+    //         Session::put('admin_id', $admin->admin_id);
+    //         return Redirect::to('/dashboard');
+    //     }
+
+    //     return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu!');
     // }
+
     public function login(Request $request)
     {
         $email = $request->input('email_account');
         $password = $request->input('password_account');
 
-        $admin_email = $request->input('email_account');
-        $admin_password = md5($request->input('password_account'));
+        $admin_email = $email;
+        $admin_password = md5($password);
 
-        $employee = DB::table('tbl_employee')
-            ->where('employee_email', $email)
-            ->first();
-
-        $customer = DB::table('tbl_customer')
-            ->where('customer_email', $email)
-            ->first();
-
+        $employee = DB::table('tbl_employee')->where('employee_email', $email)->first();
+        $customer = DB::table('tbl_customer')->where('customer_email', $email)->first();
         $admin = DB::table('tbl_admin')
             ->where('admin_email', $admin_email)
             ->where('admin_password', $admin_password)
             ->first();
 
-
-
         if ($employee) {
             if ($employee->status == 0) {
-                return Redirect::to('/customer/login')->with('error', 'Tài khoản của bạn đã bị khóa.');
+                return Redirect::to('/customer/login')->with('error', 'Tài khoản nhân viên đã bị khóa.');
             }
 
             if (Hash::check($password, $employee->employee_password)) {
                 Session::put('employee_id', $employee->employee_id);
                 Session::put('employee_name', $employee->employee_name);
                 Session::put('role', $employee->role);
-                Session::put('permissions', json_decode($employee->permissions, true) ?? []); // Lưu phân quyền
+                Session::put('permissions', json_decode($employee->permissions, true) ?? []);
                 return Redirect::to('/dashboard');
             }
         }
@@ -140,11 +173,40 @@ class CustomerController extends Controller
             }
 
             if (Hash::check($password, $customer->customer_password)) {
+                // Đăng nhập thành công → reset số lần sai
+                DB::table('tbl_customer')->where('customer_id', $customer->customer_id)->update([
+                    'login_attempts' => 0,
+                    'last_failed_login' => now()
+                ]);
+
                 Session::put('customer_id', $customer->customer_id);
                 Session::put('customer_name', $customer->customer_name);
                 return Redirect::to('/');
+            } else {
+                // Tăng số lần đăng nhập sai
+                $attempts = $customer->login_attempts + 1;
+
+                // Nếu sai 5 lần → khóa tài khoản
+                if ($attempts >= 5) {
+                    DB::table('tbl_customer')->where('customer_id', $customer->customer_id)->update([
+                        'status' => 0,
+                        'login_attempts' => $attempts,
+                        'last_failed_login' => now()
+                    ]);
+
+                    return Redirect::to('/customer/login')->with('error', 'Tài khoản của bạn đã bị khóa do đăng nhập sai quá nhiều lần.');
+                } else {
+                    DB::table('tbl_customer')->where('customer_id', $customer->customer_id)->update([
+                        'login_attempts' => $attempts,
+                        'last_failed_login' => now()
+                    ]);
+                }
+
+                return Redirect::to('/customer/login')->with('error', 'Sai tài khoản hoặc mật khẩu! (Lần thứ ' . $attempts . '/5)');
             }
         }
+
+
         if ($admin) {
             Session::put('admin_name', $admin->admin_name);
             Session::put('admin_id', $admin->admin_id);
